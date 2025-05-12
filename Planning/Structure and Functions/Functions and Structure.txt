@@ -2,19 +2,19 @@ Models —--------------------------------------------------------
 
 	User 
 	BlockedUser
-            DirectMessages
-            Community
-            UserInCommunity
-            CommunityView
-            CommunityJoinRequest
-            Post
-            RatingInPost
-            PostView
-            Attachment 
-            AttachmentInPost
-            AttachmentInComment
-            Comments
-            RatingInComment
+	DirectMessages
+	Community
+	UserInCommunity
+        CommunityView
+        CommunityJoinRequest
+        Post
+        RatingInPost
+        PostView
+        Attachment 
+        AttachmentInPost
+        AttachmentInComment
+        Comments
+        RatingInComment
 
 Repositories —-------------------------------------------------
 
@@ -28,8 +28,8 @@ Users
 Blocked_Users
 	BlockUser(id_user, id_blocked_user)
 	UnblockUser(id_user, id_blocked_user)
-            GetUsersBlockedBy(id_user)
-            IsUserBlockedBy(id_user, id_user_that_blocked)
+        GetUsersBlockedBy(id_user)
+        IsUserBlockedBy(id_user, id_user_that_blocked)
 
 Direct_Messages
 	SendMessage(id_sender, id_reciever, content, sent_at)     
@@ -65,24 +65,24 @@ Community_Join_Requests
 Posts                                                                     
 	AddPost(id_user, id_community, title, description)
 	GetPost(id_post)
-            GetApprovedPostsInCommunity(id_community)
-            GetPendingPostsInCommunity(id_community)
-            GetRejectedPostsInCommunity(id_community)
-            GetRemovedPostsInCommunity(id_community)
-            GetApprovedPostsByUser(id_user)
-            GetPendingPostsByUser(id_user)
-            GetRejectedPostsByUser(id_user)
-            GetRemovedPostsByUser(id_user)
+        GetApprovedPostsInCommunity(id_community)
+        GetPendingPostsInCommunity(id_community)
+        GetRejectedPostsInCommunity(id_community)
+        GetRemovedPostsInCommunity(id_community)
+        GetApprovedPostsByUser(id_user)
+        GetPendingPostsByUser(id_user)
+        GetRejectedPostsByUser(id_user)
+        GetRemovedPostsByUser(id_user)
 	UpdatePost(id_post, title, description)
 	ApprovePost(id_post)
-            RejectPost(id_post)
-            RemovePost(id_post)
+        RejectPost(id_post)
+        RemovePost(id_post)
 	DeletePost(id_post)
 
 Ratings_In_Posts
 	AddRating(id_post, id_user, is_upvote)
-            GetRatingsInPost(id_post)
-            HasUserRatedPost(id_post, id_user)
+        GetRatingsInPost(id_post)
+        HasUserRatedPost(id_post, id_user)
 	RemoveRating(id_post, id_user)
 
 Post_Views
@@ -114,20 +114,22 @@ Comments
 	EditComment(id_comment, content)
 	DeleteComment(id_comment)
 
-Upvotes_In_Comments --> Ratings_In_Comments
+Ratings_In_Comments
 	AddRatingInComment(id_comment, id_user, is_upvote)
 	GetRatingsInComments(id_comment)
+	HasUserRatedComment(id_comment, id_user)
+	RemoveRating(id_comment, id_user)
 
 Services —-------------------------------------------------------
 
 	UploadFile()
-            SubmitPost()
-            SubmitComment()
-            FetchRecomendedPosts(id_user)
-            FetchPopularPosts(period)
-            FetchPostsFromCommunityByRecent()
-            FetchPostsFromCommunityByPopularity(period)
-            FetchMessages(id_user)
+	SubmitPost()
+	SubmitComment()
+	FetchRecomendedPosts(id_user)
+	FetchPopularPosts(period)
+	FetchPostsFromCommunityByRecent()
+	FetchPostsFromCommunityByPopularity(period)
+	FetchMessages(id_user)
 
 Controllers —----------------------------------------------------
 
