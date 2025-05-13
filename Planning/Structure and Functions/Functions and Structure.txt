@@ -1,6 +1,7 @@
 Models —--------------------------------------------------------
 
 	User 
+		Invite_Users
 	BlockedUser
 	DirectMessages
 	Community
@@ -24,6 +25,8 @@ Users
 	UpdateUser(id_user, name, mail, password, about, is_private)
 	BanUser(id_user)
 	DeleteUser(id_user)
+	Invite_Users(id_invite, sending_user, pending_user)
+	Notification_Users(id_notification, id_user)
 
 Blocked_Users
 	BlockUser(id_user, id_blocked_user)
@@ -130,6 +133,10 @@ Services —-------------------------------------------------------
 	FetchPostsFromCommunityByRecent()
 	FetchPostsFromCommunityByPopularity(period)
 	FetchMessages(id_user)
+	Authenticator(mais pro final da aplicação)
+	InviteUser(implementei na model e no repository também)
+	Search(para procurar posts e comunidades)
+	Notification()
 
 Controllers —----------------------------------------------------
 
