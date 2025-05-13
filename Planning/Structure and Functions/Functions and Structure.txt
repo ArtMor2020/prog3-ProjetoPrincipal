@@ -1,0 +1,141 @@
+Models —--------------------------------------------------------
+
+	User 
+	BlockedUser
+	DirectMessages
+	Community
+	UserInCommunity
+        CommunityView
+        CommunityJoinRequest
+        Post
+        RatingInPost
+        PostView
+        Attachment 
+        AttachmentInPost
+        AttachmentInComment
+        Comments
+        RatingInComment
+
+Repositories —-------------------------------------------------
+
+Users
+	CreateUser(name, mail, password, about, is_private)
+	GetUser(id_user)
+	UpdateUser(id_user, name, mail, password, about, is_private)
+	BanUser(id_user)
+	DeleteUser(id_user)
+
+Blocked_Users
+	BlockUser(id_user, id_blocked_user)
+	UnblockUser(id_user, id_blocked_user)
+        GetUsersBlockedBy(id_user)
+        IsUserBlockedBy(id_user, id_user_that_blocked)
+
+Direct_Messages
+	SendMessage(id_sender, id_reciever, content, sent_at)     
+	GetUnseenMessages(id_user)
+	GetMessagesFromUser(id_user, id_reciever)
+	DeleteMessage(id_message)
+	InviteUsers(id_invite, sending_user, pending_user)
+
+Communities
+	CreateCommunity(name, description, id_owner, is_private)
+	GetCommunity(id_community)
+	UpdateCommunity((name, description, id_owner, is_private)
+	BanCommunity(id_community)
+	UnbanCommunity(id_community)
+	DeleteCommunity(id_community)
+
+User_In_Communities
+	AddUserToCommunity(id_community, id_user, role)
+	GetUsersFromCommunity(id_community)
+	GetCommunitiesFromUser(id_user)
+	BanUser(id_user, id_community)
+	UnbanUser(id_community, id_user)
+	RemoveUserFromCommunity(id_community, id_user)
+
+Community_Views
+	AddViewCount(id_community, id_user)
+	GetViewsCommunityRecieved(id_community)
+	GetViewsUserGave(id_user)
+
+Community_Join_Requests                                                   
+	AddJoinRequest(id_community, id_user)
+	UpdateJoinRequest(id_community, id_user, status)
+
+Posts                                                                     
+	AddPost(id_user, id_community, title, description)
+	GetPost(id_post)
+        GetApprovedPostsInCommunity(id_community)
+        GetPendingPostsInCommunity(id_community)
+        GetRejectedPostsInCommunity(id_community)
+        GetRemovedPostsInCommunity(id_community)
+        GetApprovedPostsByUser(id_user)
+        GetPendingPostsByUser(id_user)
+        GetRejectedPostsByUser(id_user)
+        GetRemovedPostsByUser(id_user)
+	UpdatePost(id_post, title, description)
+	ApprovePost(id_post)
+        RejectPost(id_post)
+        RemovePost(id_post)
+	DeletePost(id_post)
+
+Ratings_In_Posts
+	AddRating(id_post, id_user, is_upvote)
+        GetRatingsInPost(id_post)
+        HasUserRatedPost(id_post, id_user)
+	RemoveRating(id_post, id_user)
+
+Post_Views
+	AddViewCount(id_post, id_user)
+	GetViewsPostRecieved(id_post)
+	GetViewsUserGave(id_user)
+
+Attachments
+	AddAttachment(type, path)
+	UpdateAttachment(id, type, path)
+	DeleteAttachment(id_attachment)
+
+Attachments_In_Comments
+	AddAttachment(id_comment, id_attachment)
+	GetAttachmentsInComment(id_comment)
+	UpdateAttachment(id_comment, id_new_attachment)
+	DeleteAttachment(id_comment, id_attachment)
+
+Attachments_In_Posts
+	AddAttachment(id_post, id_attachment)
+	GetAttachmentsInPost(id_post)
+	UpdateAttachment(id_post, id_new_attachment)
+	DeleteAttachment(id_post, id_attachment)
+
+Comments
+	AddComment(id_user, id_parent_post, ?id_parent_comment, content)
+	GetComment(id_comment)
+	GetCommentsInPost(id_post)
+	EditComment(id_comment, content)
+	DeleteComment(id_comment)
+
+Ratings_In_Comments
+	AddRatingInComment(id_comment, id_user, is_upvote)
+	GetRatingsInComments(id_comment)
+	HasUserRatedComment(id_comment, id_user)
+	RemoveRating(id_comment, id_user)
+
+Services —-------------------------------------------------------
+
+	UploadFile()
+	SubmitPost()
+	SubmitComment()
+	FetchRecomendedPosts(id_user)
+	FetchPopularPosts(period)
+	FetchPostsFromCommunityByRecent()
+	FetchPostsFromCommunityByPopularity(period)
+	FetchMessages(id_user)
+	Authenticator(mais pro final da aplicação)
+	InviteUser(implementei na model e no repository também)
+	Search(para procurar posts e comunidades)
+	Notification(quando o usuario é mencionado)
+
+Controllers —----------------------------------------------------
+
+Views —----------------------------------------------------------
