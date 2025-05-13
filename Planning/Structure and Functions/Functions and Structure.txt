@@ -25,8 +25,8 @@ Users
 	UpdateUser(id_user, name, mail, password, about, is_private)
 	BanUser(id_user)
 	DeleteUser(id_user)
-	Invite_Users(id_invite, sending_user, pending_user)
-	Notification_Users(id_notification, id_user)
+	InviteUsers(id_invite, sending_user, pending_user)
+	NotificationUsers(id_notification, id_user)
 
 Blocked_Users
 	BlockUser(id_user, id_blocked_user)
