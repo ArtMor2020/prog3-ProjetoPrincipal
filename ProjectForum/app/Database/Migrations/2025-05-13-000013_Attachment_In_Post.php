@@ -22,8 +22,8 @@ class AttachmentInPost extends Migration
         ]);
 
         $this->forge->addPrimaryKey(['id_attachment', 'id_post']);
-        $this->forge->addForeignKey('id_attachment', 'attachments', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_post', 'posts', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_attachment', 'attachment', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_post', 'post', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('attachment_in_post');
     }
 

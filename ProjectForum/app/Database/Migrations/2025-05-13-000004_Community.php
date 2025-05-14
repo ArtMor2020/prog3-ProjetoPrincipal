@@ -10,10 +10,10 @@ class Community extends Migration
     {
         // community
         $this->forge->addField([
-            'id'          => ['type' => 'INT', 'auto_increment' => true],
+            'id'          => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
             'name'        => ['type' => 'VARCHAR', 'constraint' => 255],
             'description' => ['type' => 'TEXT'],
-            'id_owner'    => ['type' => 'INT'],
+            'id_owner'    => ['type' => 'INT', 'unsigned' => true,],
             'is_private'  => ['type' => 'BOOLEAN'],
             'is_deleted'  => ['type' => 'BOOLEAN'],
             'is_banned'   => ['type' => 'BOOLEAN'],

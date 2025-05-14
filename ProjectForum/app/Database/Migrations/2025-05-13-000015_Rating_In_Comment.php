@@ -26,8 +26,8 @@ class RatingInComment extends Migration
         ]);
 
         $this->forge->addPrimaryKey(['id_comment', 'id_user']);
-        $this->forge->addForeignKey('id_comment', 'comments', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_user', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_comment', 'comment', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_user', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('rating_in_comment');
     }
 

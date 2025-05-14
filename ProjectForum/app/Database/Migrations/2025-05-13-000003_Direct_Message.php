@@ -10,9 +10,9 @@ class Direct_Message extends Migration
     {
         // direct_message
         $this->forge->addField([
-            'id'          => ['type' => 'INT', 'auto_increment' => true],
-            'id_sender'   => ['type' => 'INT'],
-            'id_reciever' => ['type' => 'INT'],
+            'id'          => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'id_sender'   => ['type' => 'INT', 'unsigned' => true,],
+            'id_reciever' => ['type' => 'INT', 'unsigned' => true,],
             'content'     => ['type' => 'TEXT'],
             'sent_at'     => ['type' => 'TIMESTAMP', 'null' => true],
             'is_seen'     => ['type' => 'BOOLEAN'],

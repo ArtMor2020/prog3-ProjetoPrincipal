@@ -10,8 +10,8 @@ class User_In_Community extends Migration
     {
         // user_in_community
         $this->forge->addField([
-            'id_user'      => ['type' => 'INT'],
-            'id_community' => ['type' => 'INT'],
+            'id_user'      => ['type' => 'INT', 'unsigned' => true,],
+            'id_community' => ['type' => 'INT', 'unsigned' => true,],
             'role'         => ['type' => 'VARCHAR', 'constraint' => 255],
             'is_banned'    => ['type' => 'BOOLEAN'],
         ]);

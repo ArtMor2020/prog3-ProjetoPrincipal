@@ -4,7 +4,7 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class Comments extends Migration
+class Comment extends Migration
 {
     public function up()
     {
@@ -51,14 +51,14 @@ class Comments extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
-        $this->forge->addForeignKey('id_user', 'users', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_parent_post', 'posts', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_parent_comment', 'comments', 'id', 'CASCADE', 'CASCADE');   
-        $this->forge->createTable('comments');
+        $this->forge->addForeignKey('id_user', 'user', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_parent_post', 'post', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_parent_comment', 'comment', 'id', 'CASCADE', 'CASCADE');   
+        $this->forge->createTable('comment');
     }
 
     public function down()
     {
-        $this->forge->dropTable('comments');
+        $this->forge->dropTable('comment');
     }
 }

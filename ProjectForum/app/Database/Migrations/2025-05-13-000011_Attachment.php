@@ -10,7 +10,7 @@ class Attachment extends Migration
     {
         // attachment
         $this->forge->addField([
-            'id'         => ['type' => 'INT', 'auto_increment' => true],
+            'id'         => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
             'type'       => ['type' => 'ENUM', 'constraint' => ['IMAGE','VIDEO','GIF','DOCUMENT','ZIP','OTHER']],
             'path'       => ['type' => 'TEXT'],
             'is_deleted' => ['type' => 'BOOLEAN'],
