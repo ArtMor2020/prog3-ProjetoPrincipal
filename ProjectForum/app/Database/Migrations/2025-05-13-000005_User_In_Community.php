@@ -15,6 +15,7 @@ class User_In_Community extends Migration
             'role'         => ['type' => 'VARCHAR', 'constraint' => 255],
             'is_banned'    => ['type' => 'BOOLEAN'],
         ]);
+        $this->forge->addPrimaryKey(['id_user', 'id_community']);
         $this->forge->addForeignKey('id_user', 'user', 'id');
         $this->forge->addForeignKey('id_community', 'community', 'id');
         $this->forge->createTable('user_in_community');

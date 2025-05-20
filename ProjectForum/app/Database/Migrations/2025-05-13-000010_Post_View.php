@@ -25,6 +25,9 @@ class PostView extends Migration
             ],
         ]);
 
+        //PK
+        $this->forge->addPrimaryKey(['id_post', 'id_user']);
+
         // Foreign Keys
         $this->forge->addForeignKey('id_post', 'post', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('id_user', 'user', 'id', 'CASCADE', 'CASCADE');

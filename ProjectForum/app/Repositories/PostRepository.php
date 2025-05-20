@@ -6,5 +6,5 @@ use App\Models\PostModel;
 
 class PostRepository
 {
-
+    
 }

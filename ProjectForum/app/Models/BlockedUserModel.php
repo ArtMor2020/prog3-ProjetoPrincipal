@@ -3,16 +3,19 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use app\Entities\BlockedUserEntity;
 
 class BlockedUserModel extends Model
 {
-    private int $IdUser = 0;
-    private int $IdBlockedUser = 0;
+    protected $table            = 'blocked_user';
+    protected $primaryKey       = ['id_user', 'id_blocked_user'];
 
-    public function getIdUser(): int { return $this->IdUser; }
-    public function setIdUser(int $idUser): void { $this->IdUser = $idUser; }
+    protected $useAutoIncrement = false;
+    protected $returnType       = BlockedUserEntity::class;
 
-    public function getIdBlockedUser(): int { return $this->IdBlockedUser; }
-    public function setIdBlockedUser(int $idBlockedUser): void { $this->IdBlockedUser = $idBlockedUser; }
+    protected $allowedFields = [
+        'id_user',
+        'id_blocked_user',
+    ];
 
 }

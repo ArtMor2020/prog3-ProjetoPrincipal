@@ -1,22 +1,19 @@
 <?php
-
 namespace App\Models;
 
 use CodeIgniter\Model;
-use DateTime;
+use app\Entities\CommunityViewEntity;
 
 class CommunityViewModel extends Model
 {
-    private int $IdCommunity = 0;
-    private int $IdUser = 0;
-    private ?DateTime $ViewedAt = null;
+    protected $table            = 'community_view';
+    protected $primaryKey       = ['id_community', 'id_user'];
+    protected $useAutoIncrement = false;
+    protected $returnType       = CommunityViewEntity::class;
 
-    public function getIdCommunity(): int { return $this->IdCommunity; }
-    public function setIdCommunity(int $idCommunity): void { $this->IdCommunity = $idCommunity; }
-
-    public function getIdUser(): int { return $this->IdUser; }
-    public function setIdUser(int $idUser): void { $this->IdUser = $idUser; }
-
-    public function getViewedAt(): ?DateTime { return $this->ViewedAt; }
-    public function setViewedAt(?DateTime $viewedAt): void { $this->ViewedAt = $viewedAt; }
+    protected $allowedFields = [
+        'id_community',
+        'id_user',
+        'viewed_at',
+    ];
 }

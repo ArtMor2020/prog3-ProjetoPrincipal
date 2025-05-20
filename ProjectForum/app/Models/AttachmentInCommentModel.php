@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use app\Entities\AttachmentInCommentEntity;
 
 class AttachmentInCommentModel extends Model
 {
-    private int $IdComment = 0;
-    private int $IdAttachment = 0;
+    protected $table            = 'attachment_in_comment';
+    protected $primaryKey       = ['id_attachment', 'id_comment'];
 
-    public function getIdComment(): int { return $this->IdComment; }
-    public function setIdComment(int $idComment): void { $this->IdComment = $idComment; }
+    protected $useAutoIncrement = false;
+    protected $returnType       = AttachmentInCommentEntity::class;
 
-    public function getIdAttachment(): int { return $this->IdAttachment; }
-    public function setIdAttachment(int $idAttachment): void { $this->IdAttachment = $idAttachment; }
+    protected $allowedFields = [
+        'id_attachment',
+        'id_comment',
+    ];
 }

@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use app\Entities\AttachmentInPostEntity;
 
 class AttachmentInPostModel extends Model
 {
-    private int $IdPost = 0;
-    private int $IdAttachment = 0;
+    protected $table            = 'attachment_in_post';
+    protected $primaryKey       = ['id_attachment', 'id_post'];
 
-    public function getIdPost(): int { return $this->IdPost; }
-    public function setIdPost(int $idPost): void { $this->IdPost = $idPost; }
+    protected $useAutoIncrement = false;
+    protected $returnType       = AttachmentInPostEntity::class;
 
-    public function getIdAttachment(): int { return $this->IdAttachment; }
-    public function setIdAttachment(int $idAttachment): void { $this->IdAttachment = $idAttachment; }
+    protected $allowedFields = [
+        'id_attachment',
+        'id_post',
+    ];
 }

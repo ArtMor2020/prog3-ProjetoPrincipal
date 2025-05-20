@@ -3,21 +3,21 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use DateTime;
+use app\Entities\PostViewEntity;
 
 class PostViewModel extends Model
 {
-    private int $IdPost = 0;
-    private int $IdUser = 0;
-    private ?DateTime $ViewedAt = null;
+    protected $table            = 'post_view';
+    protected $primaryKey       = ['id_post', 'id_user'];
+    protected $useAutoIncrement = false;
+    protected $returnType       = PostViewEntity::class;
 
-    public function getIdPost(): int { return $this->IdPost; }
-    public function setIdPost(int $idPost): void { $this->IdPost = $idPost; }
+    protected $allowedFields = [
+        'id_post',
+        'id_user',
+        'viewed_at',
+    ];
 
-    public function getIdUser(): int { return $this->IdUser; }
-    public function setIdUser(int $idUser): void { $this->IdUser = $idUser; }
-
-    public function getViewedAt(): ?DateTime { return $this->ViewedAt; }
-    public function setViewedAt(?DateTime $viewedAt): void { $this->ViewedAt = $viewedAt; }
-
+    protected $useTimestamps = false;
 }
+

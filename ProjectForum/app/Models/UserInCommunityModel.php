@@ -1,26 +1,21 @@
-<?php
+<?php 
 
 namespace App\Models;
 
 use CodeIgniter\Model;
+use app\Entities\UserInCommunityEntity;
 
 class UserInCommunityModel extends Model
 {
-    private int $IdUser = 0;
-    private int $IdCommunity = 0;
-    private string $Role = '';
-    private bool $IsBanned = 0;
+    protected $table = 'user_in_community';
+    protected $primaryKey = ['id_user','id_community'];
+    protected $useAutoIncrement = false;
+    protected $returnType = UserInCommunityEntity::class;
 
-    public function getIdUser(): int { return $this->IdUser; }
-    public function setIdUser(int $idUser): void { $this->IdUser = $idUser; }
-
-    public function getIdCommunity(): int { return $this->IdCommunity; }
-    public function setIdCommunity(int $idCommunity): void { $this->IdCommunity = $idCommunity; }
-
-    public function getRole(): string { return $this->Role; }
-    public function setRole(string $role): void { $this->Role = $role; }
-
-    public function getIsBanned(): bool { return $this->IsBanned; }
-    public function setIsBanned(bool $isBanned): void { $this->IsBanned = $isBanned; }
-
+    protected $allowedFields = [
+        'id_user',
+        'id_community',
+        'role',
+        'is_banned',
+    ];
 }

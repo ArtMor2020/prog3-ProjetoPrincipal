@@ -12,8 +12,9 @@ class InitialMigration extends Migration
         $this->forge->addField([
             'id_community' => ['type' => 'INT', 'unsigned' => true,],
             'id_user'      => ['type' => 'INT', 'unsigned' => true,],
-            'viewd_at'     => ['type' => 'TIMESTAMP', 'null' => true],
+            'viewed_at'     => ['type' => 'TIMESTAMP', 'null' => true],
         ]);
+        $this->forge->addPrimaryKey(['id_user', 'id_community']);
         $this->forge->addForeignKey('id_community', 'community', 'id');
         $this->forge->addForeignKey('id_user', 'user', 'id');
         $this->forge->createTable('community_view');
