@@ -2,7 +2,7 @@
 
 **Framework:** CodeIgniter v4.6.1
 
-## 🚀 Contributors
+## 🚀 Contribuintes
 
 * Arthur Romanato Moro
 * Lucas Abati Zanotto
