@@ -36,8 +36,8 @@ Este é um sistema de fórum construído sobre o **CodeIgniter** (v4.6.1), que i
 1. **Clone o repositório:**
 
    ```bash
-   git clone https://github.com/seu-usuario/forum.git
-   cd forum
+   git clone https://github.com/ArtMor2020/prog3-ProjetoPrincipal.git
+   cd ProjectForum
    ```
 
 2. **Instale as dependências Composer:**
