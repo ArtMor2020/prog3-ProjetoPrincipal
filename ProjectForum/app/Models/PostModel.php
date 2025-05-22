@@ -2,14 +2,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\PostEntity;
+use App\Entities\PostEntity;
 
 class PostModel extends Model
 {
-    protected $table         = 'post';
-    protected $primaryKey    = 'id';
+    protected $table = 'post';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType    = PostEntity::class;
+    protected $returnType = PostEntity::class;
 
     protected $allowedFields = [
         'id_user',

@@ -2,14 +2,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\DirectMessageEntity;
+use App\Entities\DirectMessageEntity;
 
 class DirectMessageModel extends Model
 {
-    protected $table            = 'direct_message';
-    protected $primaryKey       = 'id';
+    protected $table = 'direct_message';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = DirectMessageEntity::class;
+    protected $returnType = DirectMessageEntity::class;
 
     protected $allowedFields = [
         'id_sender',

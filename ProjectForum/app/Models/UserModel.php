@@ -1,13 +1,12 @@
 <?php
-
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\UserEntity;
+use App\Entities\UserEntity;
 
 class UserModel extends Model
 {
-    protected $table = 'users';
+    protected $table = 'user';
     protected $primaryKey = 'id';
     protected $returnType = UserEntity::class;
 

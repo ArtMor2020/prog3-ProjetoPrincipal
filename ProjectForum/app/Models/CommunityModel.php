@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\CommunityEntity;
+use App\Entities\CommunityEntity;
 
 class CommunityModel extends Model
 {
-    protected $table            = 'community';
-    protected $primaryKey       = 'id';
+    protected $table = 'community';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = CommunityEntity::class;
+    protected $returnType = CommunityEntity::class;
 
     protected $allowedFields = [
         'name',

@@ -2,14 +2,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\CommentEntity;
+use App\Entities\CommentEntity;
 
 class CommentModel extends Model
 {
-    protected $table            = 'comment';
-    protected $primaryKey       = 'id';
+    protected $table = 'comment';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = CommentEntity::class;
+    protected $returnType = CommentEntity::class;
 
     protected $allowedFields = [
         'id_user',

@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\UserInCommunityEntity;
+use App\Entities\UserInCommunityEntity;
 
 class UserInCommunityModel extends Model
 {
     protected $table = 'user_in_community';
-    protected $primaryKey = ['id_user','id_community'];
+    protected $primaryKey = ['id_user', 'id_community'];
     protected $useAutoIncrement = false;
     protected $returnType = UserInCommunityEntity::class;
 

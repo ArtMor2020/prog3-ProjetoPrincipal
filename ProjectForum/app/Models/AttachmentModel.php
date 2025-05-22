@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\AttachmentEntity;
+use App\Entities\AttachmentEntity;
 
 class AttachmentModel extends Model
 {
-    protected $table            = 'attachment';
-    protected $primaryKey       = 'id';
+    protected $table = 'attachment';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = AttachmentEntity::class;
+    protected $returnType = AttachmentEntity::class;
 
     protected $allowedFields = [
         'type',                           // IMAGE, VIDEO, GIF, DOCUMENT, ZIP, OTHER

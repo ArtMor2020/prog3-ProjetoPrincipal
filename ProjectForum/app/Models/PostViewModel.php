@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use app\Entities\PostViewEntity;
+use App\Entities\PostViewEntity;
 
 class PostViewModel extends Model
 {
-    protected $table            = 'post_view';
-    protected $primaryKey       = ['id_post', 'id_user'];
+    protected $table = 'post_view';
+    protected $primaryKey = ['id_post', 'id_user'];
     protected $useAutoIncrement = false;
-    protected $returnType       = PostViewEntity::class;
+    protected $returnType = PostViewEntity::class;
 
     protected $allowedFields = [
         'id_post',
