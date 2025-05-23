@@ -36,7 +36,6 @@ Direct_Messages
 	GetUnseenMessages(id_user)
 	GetMessagesFromUser(id_user, id_reciever)
 	DeleteMessage(id_message)
-	InviteUsers(id_invite, sending_user, pending_user)
 
 Communities
 	CreateCommunity(name, description, id_owner, is_private)
@@ -135,6 +134,7 @@ Services —-------------------------------------------------------
 	InviteUser(implementei na model e no repository também)
 	Search(para procurar posts e comunidades)
 	Notification(quando o usuario é mencionado)
+	InviteUsersToCommunity(id_invite, sending_user, pending_user)
 
 Controllers —----------------------------------------------------
 

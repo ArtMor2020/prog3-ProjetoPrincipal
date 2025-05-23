@@ -21,6 +21,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "App\\Repositories\\": "app/Repositories/",
             "Config\\": "app/Config/"
         },
         "exclude-from-classmap": [

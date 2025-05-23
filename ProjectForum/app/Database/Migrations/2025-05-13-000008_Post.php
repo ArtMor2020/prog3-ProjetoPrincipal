@@ -10,9 +10,9 @@ class Post extends Migration
     {
         // post
         $this->forge->addField([
-            'id'           => ['type' => 'INT', 'auto_increment' => true],
-            'id_user'      => ['type' => 'INT'],
-            'id_community' => ['type' => 'INT'],
+            'id'           => ['type' => 'INT', 'unsigned' => true, 'auto_increment' => true],
+            'id_user'      => ['type' => 'INT', 'unsigned' => true,],
+            'id_community' => ['type' => 'INT', 'unsigned' => true,],
             'title'        => ['type' => 'VARCHAR', 'constraint' => 255],
             'description'  => ['type' => 'TEXT'],
             'posted_at'    => ['type' => 'TIMESTAMP'],

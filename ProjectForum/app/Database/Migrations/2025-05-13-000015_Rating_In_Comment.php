@@ -4,12 +4,12 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class PostView extends Migration
+class RatingInComment extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'id_post' => [
+            'id_comment' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'unsigned' => true,
@@ -19,21 +19,20 @@ class PostView extends Migration
                 'constraint' => 11,
                 'unsigned' => true,
             ],
-            'viewed_at' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
+            'is_upvote' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
             ],
         ]);
 
-        // Foreign Keys
-        $this->forge->addForeignKey('id_post', 'post', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addPrimaryKey(['id_comment', 'id_user']);
+        $this->forge->addForeignKey('id_comment', 'comment', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('id_user', 'user', 'id', 'CASCADE', 'CASCADE');
-        
-        $this->forge->createTable('post_view');
+        $this->forge->createTable('rating_in_comment');
     }
 
     public function down()
     {
-        $this->forge->dropTable('post_view');
+        $this->forge->dropTable('rating_in_comment');
     }
 }

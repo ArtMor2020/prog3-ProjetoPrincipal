@@ -10,10 +10,10 @@ class Blocked_User extends Migration
     {
         // blocked_user
         $this->forge->addField([
-            'id_user'         => ['type' => 'INT'],
-            'id_blocked_user' => ['type' => 'INT'],
+            'id_user'         => ['type' => 'INT', 'unsigned' => true,],
+            'id_blocked_user' => ['type' => 'INT', 'unsigned' => true,],
         ]);
-        $this->forge->addKey('id_user', true);
+        $this->forge->addPrimaryKey(['id_user', 'id_blocked_user']);
         $this->forge->addForeignKey('id_user', 'user', 'id');
         $this->forge->addForeignKey('id_blocked_user', 'user', 'id');
         $this->forge->createTable('blocked_user');

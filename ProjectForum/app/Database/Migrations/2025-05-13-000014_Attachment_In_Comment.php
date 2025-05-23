@@ -22,8 +22,8 @@ class AttachmentInComment extends Migration
         ]);
 
         $this->forge->addPrimaryKey(['id_attachment', 'id_comment']);
-        $this->forge->addForeignKey('id_attachment', 'attachments', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_comment', 'comments', 'id', 'CASCADE', 'CASCADE');   
+        $this->forge->addForeignKey('id_attachment', 'attachment', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_comment', 'comment', 'id', 'CASCADE', 'CASCADE');   
         $this->forge->createTable('attachment_in_comment');
     }
 
