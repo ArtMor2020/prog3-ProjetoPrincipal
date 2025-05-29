@@ -85,4 +85,42 @@ class CommunityRepository
     {
         return $this->model->like('name', $name)->findAll();
     }
+
+    public function getCommunitiesByName(string $name): array
+    {
+        // gets all users with 'name' similar to $name
+        $rows = $this->model->like('name', $name)
+                            ->where('is_banned', false)
+                            ->where('is_deleted', false)
+                            ->findAll();
+        $communities = [];
+
+        // finds how similar the 'name' and $name are using levenshtein distance
+        foreach($rows as $row){
+            
+            $levenshteinDistance = levenshtein($name, $row->getName()); // find how well the name matches the search
+            $maxLength = max(strlen($name), strlen($row->getName()));
+            
+            $matchPercentage = $maxLength == 0 ? 100 : (1 - ($levenshteinDistance / $maxLength)) * 100;
+            
+            $communities[] = [
+                'community' => $row,
+                'matchPercentage' => round($matchPercentage, 2)
+            ];
+        }
+        
+        // sorts by similarity
+        usort($communities, function($a, $b) {
+            return $b['matchPercentage'] - $a['matchPercentage']; 
+        });
+
+        $sortedCommunities = [];
+
+        // extracts user model from array
+        foreach($communities as $community){
+            $sortedCommunities[] = $community['community']->toArray();
+        }
+
+        return $sortedCommunities;
+    }
 }

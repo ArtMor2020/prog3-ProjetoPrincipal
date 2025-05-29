@@ -31,4 +31,10 @@ class DirectMessageRepository
     {
         return $this->model->update($id, ['is_seen' => true]);
     }
+
+    public function getUnseenMessagesForUser(int $userId){
+        return $this->model->where('id_reciever', $userId)
+                            ->where('is_seen', false)
+                            ->findAll();
+    }
 }

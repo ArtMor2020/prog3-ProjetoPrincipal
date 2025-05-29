@@ -10,7 +10,7 @@ class CommunityJoinRequestEntity extends Entity
         'id_community' => null,
         'id_user'      => null,
         'requested_at' => null,
-        'status'       => null, // e.g. 'pending', 'approved', 'rejected'
+        'status'       => null, // 'pending', 'approved', 'rejected', 'invited'?
     ];
 
     public function getIdCommunity() {

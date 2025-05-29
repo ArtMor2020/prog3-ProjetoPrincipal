@@ -145,6 +145,9 @@ $routes->group('ratings-in-comments', function ($routes) {
     $routes->get('(:num)/votes/list', 'RatingInCommentController::listVotes/$1');
 });
 
+$routes->group('search', function($routes) {
+    $routes->get('(:segment)', 'SearchController::query/$1');
+});
 
 if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php')) {
     require APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php';

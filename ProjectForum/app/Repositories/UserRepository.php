@@ -35,6 +35,46 @@ class UserRepository
         }
     }
 
+    public function getUsersByName(string $name): array{
+
+        // gets all users with 'name' similar to $name
+        $rows = $this->userModel->like('name', $name)
+                            ->where('is_private', false)
+                            ->where('is_banned', false)
+                            ->where('is_deleted', false)
+                            ->findAll();
+        
+        $users = [];
+
+        // finds how similar the 'name' and $name are using levenshtein distance
+        foreach($rows as $row){
+
+            $levenshteinDistance = levenshtein($name, $row->getName());
+            $maxLength = max(strlen($name), strlen($row->getName()));
+
+            $matchPercentage = $maxLength == 0 ? 100 : (1 - ($levenshteinDistance / $maxLength)) * 100;
+
+            $users[] = [
+                'user' => $row,
+                'matchPercentage' => round($matchPercentage, 2)
+            ];
+        }
+
+        // sorts by similarity
+        usort($users, function($a, $b) {
+            return $b['matchPercentage'] - $a['matchPercentage']; 
+        });
+
+        $sortedUsers = [];
+
+        // extracts user model from array
+        foreach($users as $user){
+            $sortedUsers[] = $user['user']->toArray();
+        }
+
+        return $sortedUsers;
+    }
+
     public function createUser(UserEntity $userEntity): int|false
     {
         if ($this->userModel->where('email', $userEntity->getEmail())->first()) {
