@@ -19,8 +19,10 @@ class CommunityJoinRequestRepository
         if (
             $this->model->where('id_community', $communityId)
                 ->where('id_user', $userId)
+                // so user can make another request after a week,
+                ->where('requested_at >=', date('Y-m-d H:i:s', strtotime('-7 day')))
                 ->first()
-        ) {
+        ) { 
             return false;
         }
 
@@ -36,28 +38,33 @@ class CommunityJoinRequestRepository
             ->insert($data);
     }
 
-    protected function updateStatus(int $communityId, int $userId, string $status): bool
+    protected function updateStatus(int $id, string $status): bool
     {
         return (bool) $this->model
             ->builder()
-            ->where('id_community', $communityId)
-            ->where('id_user', $userId)
+            ->where('id', $id)
             ->update(['status' => $status]);
     }
 
-    public function approve(int $communityId, int $userId): bool
+    public function approve(int $idRequest): bool
     {
-        return $this->updateStatus($communityId, $userId, 'approved');
+        return $this->updateStatus($idRequest, 'approved');
     }
 
-    public function reject(int $communityId, int $userId): bool
+    public function reject(int $idRequest): bool
     {
-        return $this->updateStatus($communityId, $userId, 'rejected');
+        return $this->updateStatus($idRequest, 'rejected');
     }
 
     public function listAll(): array
     {
         return $this->model->orderBy('requested_at', 'DESC')->findAll();
+    }
+
+    public function getRequest(int $idRequest): array|null
+    {
+        return $this->model->where('id', $idRequest)
+                            ->first();
     }
 
     public function listByCommunity(int $communityId): array

@@ -65,4 +65,17 @@ class RatingInCommentRepository
             ->get()
             ->getResultArray();
     }
+
+    public function removeVote(int $commentId, int $userId): bool
+    {
+        try {
+            return $this->db->table($this->table)
+                            ->where('id_comment', $commentId)
+                            ->where('id_user', $userId)
+                            ->delete();
+        } catch (\Throwable $e) {
+            log_message('error', '[removeVote] ' . $e->getMessage());
+            return false;
+        }
+    }
 }

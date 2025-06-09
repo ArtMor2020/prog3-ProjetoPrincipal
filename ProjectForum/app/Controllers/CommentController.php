@@ -2,17 +2,21 @@
 
 namespace App\Controllers;
 
+use App\Database\Seeds\CommentSeeder;
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\CommentRepository;
+use App\Services\CommentService;
 
 class CommentController extends ResourceController
 {
     protected $format = 'json';
     protected CommentRepository $repository;
+    protected CommentService $commentService;
 
     public function __construct()
     {
         $this->repository = new CommentRepository();
+        $this->commentService = new CommentService();
     }
 
     public function index($postId = null)
@@ -54,6 +58,38 @@ class CommentController extends ResourceController
 
     $id = $this->repository->create($data);
     return $this->respondCreated(['id' => $id]);
+    }
+
+    public function submit()
+    {
+
+        $comment = $this->request->getPost();
+
+        $files = $this->request->getFiles();
+        $uploadedFiles = [];
+
+        if (!empty($files['attachments'])) {
+            if (is_array($files['attachments'])) {
+                foreach ($files['attachments'] as $file) {
+                    if ($file->isValid() && !$file->hasMoved()) {
+                        $uploadedFiles[] = $file;
+                    }
+                }
+            } else {
+                $file = $files['attachments'];
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $uploadedFiles[] = $file;
+                }
+            }
+        }
+
+        $commentId = $this->commentService->submitComment($comment, ...$uploadedFiles);
+
+        if (!$commentId) {
+            return $this->failValidationError('Invalid comment data.');
+        }
+
+        return $this->respondCreated(['id' => $commentId]);
     }
 
     public function reply($commentId = null)

@@ -69,4 +69,16 @@ class RatingInPostRepository
 
         return $up - $down;
     }
+
+    public function removeVote(int $postId, int $userId): bool
+    {
+        try {
+            return $this->model->where('id_post', $postId)
+                            ->where('id_user', $userId)
+                            ->delete();
+        } catch (\Throwable $e) {
+            log_message('error', '[removeVote] ' . $e->getMessage());
+            return false;
+        }
+    }
 }

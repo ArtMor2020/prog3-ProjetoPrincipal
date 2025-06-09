@@ -4,5 +4,8 @@ namespace App\Services;
 
 class InviteService
 {
-    function InviteUser(int $invitedUserId){}
+    function InviteUser(int $invitedUserId)
+    {
+        
+    }
 }

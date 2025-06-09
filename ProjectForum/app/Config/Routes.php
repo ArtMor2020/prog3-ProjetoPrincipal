@@ -26,6 +26,7 @@ $routes->group('users', function (RouteCollection $routes) {
     $routes->put('(:num)/ban', 'UserController::ban/$1');
     $routes->put('(:num)/unban', 'UserController::unban/$1');
     $routes->put('(:num)/restore', 'UserController::restore/$1');
+    $routes->get('name/(:any)', 'UserController::showByName/$1');
 });
 
 $routes->group('communities', function (RouteCollection $routes) {
@@ -44,10 +45,16 @@ $routes->group('communities', function (RouteCollection $routes) {
 $routes->group('posts', function (RouteCollection $routes) {
     $routes->get('', 'PostController::index');
     $routes->get('community/(:segment)', 'PostController::index/$1');
+    $routes->get('popular/', 'PostController::getPopular');
     $routes->get('(:segment)', 'PostController::show/$1');
     $routes->post('', 'PostController::create');
     $routes->put('(:segment)', 'PostController::update/$1');
     $routes->delete('(:segment)', 'PostController::delete/$1');
+    $routes->get('title/(:any)', 'PostController::getByTitle/$1');
+    $routes->get('community/(:num)/popular', 'PostController::getPopularInCommunity/$1'); // horrible route
+    $routes->get('recommended/(:num)', 'PostController::getRecommended/$1');
+    $routes->post('submit', 'PostController::submit');
+
 });
 
 $routes->group('comments', function (RouteCollection $routes) {
@@ -60,6 +67,7 @@ $routes->group('comments', function (RouteCollection $routes) {
     $routes->get('comment/(:num)', 'CommentController::byParent/$1');
     $routes->post('(:num)/reply', 'CommentController::reply/$1');
     $routes->delete('(:num)', 'CommentController::delete/$1');
+    $routes->post('submit', 'CommentController::submit');
 });
 
 $routes->group('blocked-users', function ($routes) {
@@ -72,6 +80,7 @@ $routes->group('direct-messages', function ($routes) {
     $routes->post('', 'DirectMessageController::create');
     $routes->get('conversation/(:num)/(:num)', 'DirectMessageController::conversation/$1/$2');
     $routes->put('(:num)/seen', 'DirectMessageController::markSeen/$1');
+    $routes->get('messages/unseen/(:num)', 'DirectMessageController::getUnseen/$1');
 });
 
 $routes->group('user-communities', function ($routes) {
@@ -100,14 +109,15 @@ $routes->group('community-join-requests', function ($routes) {
     $routes->get('community/(:num)', 'CommunityJoinRequestController::byCommunity/$1');
     $routes->get('user/(:num)', 'CommunityJoinRequestController::byUser/$1');
     $routes->post('', 'CommunityJoinRequestController::create');
-    $routes->put('(:num)/(:num)/approve', 'CommunityJoinRequestController::approve/$1/$2');
-    $routes->put('(:num)/(:num)/reject', 'CommunityJoinRequestController::reject/$1/$2');
+    $routes->put('(:num)/approve', 'CommunityJoinRequestController::approve/$1');
+    $routes->put('(:num)/reject', 'CommunityJoinRequestController::reject/$1');
 });
 
 $routes->group('ratings-in-posts', function ($routes) {
     $routes->post('(:num)/votes', 'RatingInPostController::toggle/$1');
     $routes->get('(:num)/votes', 'RatingInPostController::list/$1');
     $routes->get('(:num)/score', 'RatingInPostController::score/$1');
+    $routes->delete('(:num)/vote/delete', 'RatingInPostController::remove/$1');
 });
 
 $routes->group('post-views', function ($routes) {
@@ -143,10 +153,19 @@ $routes->group('ratings-in-comments', function ($routes) {
     $routes->post('(:num)/votes', 'RatingInCommentController::toggle/$1');
     $routes->get('(:num)/votes', 'RatingInCommentController::score/$1');
     $routes->get('(:num)/votes/list', 'RatingInCommentController::listVotes/$1');
+    $routes->delete('(:num)/vote/remove', 'RatingInCommentController::remove/$1');
 });
 
 $routes->group('search', function($routes) {
     $routes->get('(:segment)', 'SearchController::query/$1');
+});
+
+$routes->group('friendship', function($routes) {
+    $routes->post('send-request', 'FriendshipController::sendRequest');
+    $routes->get('requests/(:num)', 'FriendshipController::getRequests/$1');
+    $routes->put('accept/(:num)', 'FriendshipController::acceptRequest/$1');
+    $routes->delete('refuse/(:num)', 'FriendshipController::refuseRequest/$1');
+    $routes->get('friends/(:num)', 'FriendshipController::getFriends/$1');
 });
 
 if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php')) {

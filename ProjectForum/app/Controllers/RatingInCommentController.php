@@ -42,4 +42,22 @@ class RatingInCommentController extends ResourceController
         $votes = $this->repo->getVotes((int) $commentId);
         return $this->respond($votes);
     }
+
+    public function remove($commentId)
+    {
+        $data = $this->request->getJSON(true);
+
+        if ( empty($data['id_user']) ) return $this->failValidationError('Campos id_user é obrigatório');
+
+        $commentId = (int) $commentId;
+        $userId = (int) $data['id_user'];
+
+        $success = $this->repo->removeVote($commentId, $userId);
+
+        if (!$success) {
+            return $this->failNotFound('Vote not found or already removed.');
+        }
+
+        return $this->respondDeleted(['status' => 'deleted']);
+    }
 }

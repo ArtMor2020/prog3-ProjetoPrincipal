@@ -61,4 +61,13 @@ class DirectMessageController extends ResourceController
             ? $this->respond(['status' => 'seen'])
             : $this->failNotFound('Mensagem não encontrada ou erro ao marcar como lida.');
     }
+
+    public function getUnseen($id)
+    {
+            if (!is_numeric($id)) {
+            return $this->failValidationError('ID de mensagem inválido.');
+            }
+
+            return $this->repository->getUnseenMessagesForUser($id);
+    }
 }

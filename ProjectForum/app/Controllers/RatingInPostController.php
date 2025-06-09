@@ -54,4 +54,22 @@ class RatingInPostController extends ResourceController
             'score' => $score,
         ]);
     }
+
+    public function remove($postId)
+    {
+        $data = $this->request->getJSON(true);
+
+        if ( empty($data['id_user']) ) return $this->failValidationError('Campos id_user é obrigatório');
+
+        $postId = (int) $postId;
+        $userId = (int) $data['id_user'];
+
+        $success = $this->repository->removeVote($postId, $userId);
+
+        if (!$success) {
+            return $this->failNotFound('Vote not found or already removed.');
+        }
+
+        return $this->respondDeleted(['status' => 'deleted']);
+    }
 }

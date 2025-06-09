@@ -2,17 +2,21 @@
 
 namespace App\Controllers;
 
+use App\Database\Migrations\Community;
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\CommunityJoinRequestRepository;
+use App\Services\CommunityJoinRequestService;
 
 class CommunityJoinRequestController extends ResourceController
 {
     protected $format = 'json';
     protected CommunityJoinRequestRepository $repository;
+    protected CommunityJoinRequestService $communityJoinRequestService;
 
     public function __construct()
     {
         $this->repository = new CommunityJoinRequestRepository();
+        $this->communityJoinRequestService = new CommunityJoinRequestService();
     }
 
     public function index()
@@ -39,18 +43,18 @@ class CommunityJoinRequestController extends ResourceController
             : $this->fail('Already requested or invalid', 400);
     }
 
-    public function approve($communityId, $userId)
+    public function approve($id)
     {
-        $ok = $this->repository->approve((int) $communityId, (int) $userId);
+        $ok = $this->communityJoinRequestService->acceptRequest((int) $id);
         if (!$ok) {
             return $this->fail('Cannot approve request', 400);
         }
         return $this->respond(['status' => 'approved']);
     }
 
-    public function reject($communityId, $userId)
+    public function reject($id)
     {
-        $ok = $this->repository->reject((int) $communityId, (int) $userId);
+        $ok = $this->repository->reject((int) $id);
         return $ok ? $this->respond(['message' => 'Rejected']) : $this->fail('Cannot reject', 400);
     }
 }

@@ -33,6 +33,15 @@ class UserController extends ResourceController
             : $this->failNotFound('User not found');
     }
 
+    public function showByName($name)
+    {
+        $user = $this->repository->getUserByName($name);
+
+        return $user
+            ? $this->respond($user)
+            : $this->failNotFound('User not found');
+    }
+
     public function create()
     {
         $data = $this->request->getJSON(true);
