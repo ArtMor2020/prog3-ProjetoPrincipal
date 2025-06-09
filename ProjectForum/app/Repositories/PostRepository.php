@@ -157,8 +157,6 @@ class PostRepository
 
         $builder = $this->model->builder();
 
-        log_message('error','1');
-
         $builder->select('post.*, COALESCE(SUM(CASE WHEN rating_in_post.is_upvote = 1 THEN 1 ELSE -1 END), 0) AS score')
             ->join('rating_in_post', 'post.id = rating_in_post.id_post', 'left')
             ->where('post.is_approved', 1)
@@ -169,8 +167,6 @@ class PostRepository
             ->limit($postsPerPage, $offset);
         
         $posts = $builder->get()->getResultArray();
-
-        log_message('error','2');
         
         return $posts;
     }

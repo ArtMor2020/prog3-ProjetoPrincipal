@@ -47,10 +47,8 @@ class PostController extends ResourceController
         $page = $this->request->getGet('page') ?: null;
         $postsPerPage = $this->request->getGet('posts-per-page') ?: null;
 
-        log_message('error','0');
-
         $posts = $this->repository->getPopularPosts($page, $postsPerPage);
-        log_message('error','3');
+        
         return $this->respond($posts);
     }
 
