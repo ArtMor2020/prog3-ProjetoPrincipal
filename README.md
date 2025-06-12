@@ -36,7 +36,7 @@ Este projeto é um fórum completo dividido em *backend* e *frontend*, com recur
 1. Clone e entre na pasta:
 
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/ArtMor2020/prog3-ProjetoPrincipal.git
    cd Backend
    ```
 2. Instale dependências:
