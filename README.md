@@ -1,6 +1,9 @@
-# Forum Project
+# Forum Application
 
-**Framework:** CodeIgniter v4.6.1
+**Backend:**  [CodeIgniter v4.6.1](/Backend)
+**Frontend:** React + Vite
+
+---
 
 ## 🚀 Contribuintes
 
@@ -9,74 +12,106 @@
 
 ---
 
-## 📋 Descrição
+## 📋 Visão Geral
 
-Este é um sistema de fórum construído sobre o **CodeIgniter** (v4.6.1), que inclui funcionalidades de:
+Este projeto é um fórum completo dividido em *backend* e *frontend*, com recursos como:
 
-* Gerenciamento de usuários (registro, autenticação, perfis, banimentos)
-* Comunidades (criação, banimento, solicitação de ingresso)
-* Posts e comentários (CRUD, votos, visualizações, anexos)
-* Mensagens diretas
-* Relacionamentos user<->community
+* **Usuários:** registro, login, perfil, privacidade, banimento e soft‑delete
+* **Comunidades:** criação, privacidade, banimento, solicitações e convites
+* **Posts & Comentários:** CRUD, votos, contagem de visualizações e anexos
+* **Mensagens Diretas:** envio, marcação como lido
+* **Serviços RESTful:** endpoints dedicados para cada entidade
 
 ---
 
-## 🔧 Pré-requisitos
+## 🔧 Pré‑requisitos Backend
 
 * PHP >= 8.0
 * Composer
-* MySQL
+* MySQL ou MariaDB
 * Extensões PHP: `intl`, `mbstring`, `pdo_mysql`, `curl`
-* Servidor Web (Apache, Nginx ou embutido)
 
----
+### Instalação Backend
 
-## 🏗️ Instalação e Configuração
-
-1. **Clone o repositório:**
+1. Clone e entre na pasta:
 
    ```bash
-   git clone https://github.com/ArtMor2020/prog3-ProjetoPrincipal.git
-   cd ProjectForum
+   git clone <repo-url>
+   cd Backend
    ```
-
-2. **Instale as dependências Composer:**
+2. Instale dependências:
 
    ```bash
    composer install
    ```
-
-3. **Copie o arquivo de ambiente e edite:**
+3. Copie e ajuste o `.env`:
 
    ```bash
    cp env .env
    ```
 
-   Configure as variáveis `database.default.*` no `.env` (host, username, password, database).
-
-4. **Crie o banco de dados e rode as migrations:**
+   Defina `database.default.*` com suas credenciais.
+4. Crie o banco e execute migrações:
 
    ```bash
    php spark migrate
    ```
-
-5. **Popule com dados de teste (seeders):**
+5. (Opcional) Seeders:
 
    ```bash
    php spark db:seed DatabaseSeeder
    ```
 
----
-
-## ▶️ Executando o Servidor
-
-Você pode usar o servidor embutido do PHP:
+### Executando API
 
 ```bash
 php spark serve
 ```
 
-Acesse em [http://localhost:8080](http://localhost:8080).
+A API ficará disponível em `http://localhost:8080`.
+
+---
+
+## 🔧 Pré‑requisitos Frontend
+
+* Node.js >= 16
+* npm ou yarn
+
+### Instalação Frontend
+
+1. Entre na pasta:
+
+   ```bash
+   cd Frontend
+   ```
+2. Instale dependências:
+
+   ```bash
+   npm install
+   # ou yarn
+   ```
+3. Rode o servidor de desenvolvimento:
+
+   ```bash
+   npm run dev
+   ```
+
+A aplicação roda em `http://localhost:5173` por padrão.
+
+---
+
+## 🔄 Fluxo de Desenvolvimento
+
+### Backend
+
+* Endpoints RESTful organizados por controlador/repositório/serviço.
+* CORS configurado em `app/Config/Cors.php` para permitir chamadas do frontend.
+
+### Frontend
+
+* React Router para rotas: `/login`, `/register`, `/home`, `/posts/:id`, `/users/:id`, `/communities/:id`, `/post/create`, `/community/create`
+* `UserContext` armazena informações do usuário logado.
+* Componentes reutilizáveis: `Header`, `PostCard`, `CommentCard`, `PostVoteHeader`.
 
 ---
 
@@ -88,11 +123,22 @@ Veja o diagrama das tabelas neste link:
 
 ---
 
-## 🤝 Contribuindo
+## 🎨 Wireframes Frontend
+
+> [Excalidraw com telas e navegação](https://excalidraw.com/#room=a8db75fd296f86d44e95,Rfbj5Ruwn0MRNsRFFbL4DA)
+
+---
+
+## 🤝 Como Contribuir
 
 1. Fork no repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas alterações (`git commit -m 'feat: descrição da feature'`)
-4. Push para sua branch (`git push origin feature/nova-funcionalidade`)
+2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
+3. Commit suas alterações: `git commit -m 'feat: descrição'`
+4. Push: `git push origin feature/nova-funcionalidade`
 5. Abra um Pull Request
 
+---
+
+## 📝 Licença
+
+Este projeto é licenciado sob a MIT License.
