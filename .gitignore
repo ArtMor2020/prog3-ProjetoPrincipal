@@ -1,0 +1,28 @@
+# Dependências do Node.js
+Frontend/node_modules/
+# Optional: lock files
+Frontend/package-lock.json
+Frontend/yarn.lock
+
+# Vite
+Frontend/dist/
+Frontend/.vite/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.vscode/
+.idea/
+
+# Composer / PHP
+Backend/vendor/
+Backend/.env
+Backend/writable/
