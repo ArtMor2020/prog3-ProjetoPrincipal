@@ -1,6 +1,6 @@
 # Forum Application
 
-**Backend:**  [CodeIgniter v4.6.1](/Backend)
+**Backend:**  CodeIgniter v4.6.1
 **Frontend:** React + Vite
 
 ---
