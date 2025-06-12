@@ -117,9 +117,7 @@ A aplicação roda em `http://localhost:5173` por padrão.
 
 ## 📐 Design do Banco de Dados
 
-Veja o diagrama das tabelas neste link:
-
-> [https://excalidraw.com/#room=47268d9fafe3e3264aed,jBRXUdYh24DLouXEuZmBLA](https://excalidraw.com/#room=47268d9fafe3e3264aed,jBRXUdYh24DLouXEuZmBLA)
+> [Excalidraw com os diagramas das tabelas](https://excalidraw.com/#room=47268d9fafe3e3264aed,jBRXUdYh24DLouXEuZmBLA)
 
 ---
 
