@@ -89,7 +89,6 @@ A API ficará disponível em `http://localhost:8080`.
 
    ```bash
    npm install
-   # ou yarn
    ```
 3. Rode o servidor de desenvolvimento:
 
