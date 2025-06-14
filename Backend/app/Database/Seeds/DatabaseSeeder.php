@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
     {
         $data = [
             [
-                'name' => 'Admin User',
+                'name' => 'AdminUser',
                 'email' => 'admin@example.com',
                 'password' => password_hash('password123', PASSWORD_BCRYPT),
                 'about' => 'Administrator of the system.',
@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
                 'is_deleted' => false,
             ],
             [
-                'name' => 'John Doe',
+                'name' => 'JohnDoe',
                 'email' => 'john.doe@example.com',
                 'password' => password_hash('secret', PASSWORD_BCRYPT),
                 'about' => 'Just a test user.',
@@ -256,6 +256,24 @@ class CommentSeeder extends Seeder
         $this->db->table('comment')->insertBatch($data);
     }
 }
+
+class FriendshipSeeder extends Seeder
+{
+    public function run()
+    {
+        $data = [
+            [
+                'id_user1' => 1,
+                'id_user2' => 2,
+                'status' => 'friends',
+                'requested_at' => date('Y-m-d H:i:s', strtotime('-1 day')),
+                'friends_since'=> date('Y-m-d H:i:s'),
+            ]
+        ];
+        $this->db->table('friendship')->insertBatch($data);
+    }
+}
+
 class DatabaseSeeder extends Seeder
 {
     public function run()
@@ -275,5 +293,6 @@ class DatabaseSeeder extends Seeder
         $this->call('App\Database\Seeds\AttachmentInPostSeeder');
         $this->call('App\Database\Seeds\AttachmentInCommentSeeder');
         $this->call('App\Database\Seeds\RatingInCommentSeeder');
+        $this->call('App\Database\Seeds\FriendshipSeeder');
     }
 }

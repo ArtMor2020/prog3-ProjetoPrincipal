@@ -15,6 +15,10 @@ class DirectMessageController extends ResourceController
         $this->repository = new DirectMessageRepository();
     }
 
+    /**
+     * POST /direct-messages
+     * Envia uma nova mensagem direta
+     */
     public function create()
     {
         $data = $this->request->getJSON(true);
@@ -24,34 +28,45 @@ class DirectMessageController extends ResourceController
         }
 
         $insert = [
-            'id_sender' => (int) $data['id_sender'],
+            'id_sender'   => (int) $data['id_sender'],
             'id_reciever' => (int) $data['id_reciever'],
-            'content' => $data['content'],
-            'sent_at' => date('Y-m-d H:i:s'),
+            'content'     => $data['content'],
+            'sent_at'     => date('Y-m-d H:i:s'),
         ];
 
         $id = $this->repository->sendMessage($insert);
 
-        if (!$id) {
+        if (! $id) {
             return $this->fail('Falha ao enviar mensagem.', 500);
         }
 
-        return $this->respondCreated(['id' => $id, 'status' => 'sent']);
+        return $this->respondCreated([
+            'id'     => $id,
+            'status' => 'sent',
+        ]);
     }
 
+    /**
+     * GET /direct-messages/conversation/{userA}/{userB}
+     * Recupera toda a conversa entre dois usuários
+     */
     public function conversation($userA = null, $userB = null)
     {
-        if (!is_numeric($userA) || !is_numeric($userB)) {
+        if (! is_numeric($userA) || ! is_numeric($userB)) {
             return $this->failValidationError('IDs de usuário inválidos.');
         }
 
-        $msgs = $this->repository->getConversation((int) $userA, (int) $userB);
-
-        return $this->respond($msgs);
+        $messages = $this->repository->getConversation((int) $userA, (int) $userB);
+        return $this->respond($messages);
     }
+
+    /**
+     * PUT /direct-messages/{messageId}/seen
+     * Marca uma mensagem como lida
+     */
     public function markSeen($id = null)
     {
-        if (!is_numeric($id)) {
+        if (! is_numeric($id)) {
             return $this->failValidationError('ID de mensagem inválido.');
         }
 
@@ -60,5 +75,19 @@ class DirectMessageController extends ResourceController
         return $success
             ? $this->respond(['status' => 'seen'])
             : $this->failNotFound('Mensagem não encontrada ou erro ao marcar como lida.');
+    }
+
+    /**
+     * GET /direct-messages/messages/unseen/{userId}
+     * Recupera todas as mensagens não lidas de um usuário
+     */
+    public function getUnseen($userId = null)
+    {
+        if (! is_numeric($userId)) {
+            return $this->failValidationError('ID de usuário inválido.');
+        }
+
+        $messages = $this->repository->getUnseenMessagesForUser((int) $userId);
+        return $this->respond($messages);
     }
 }

@@ -53,8 +53,22 @@ public function authenticate(string $email, string $password): UserEntity|false
 
     return $user;
 }
-    public function getUsersByName(string $name): array{
+public function getUserByName(string $name): array|null
+    {
+        if (empty($name)) return null;
 
+        $name = $this->sanitizeName($name);
+        $user = $this->userModel->where('name', $name)->first();
+
+        return $user->toArray();
+    }
+
+    public function getUsersByName(string $name): array|null
+    {
+        if (empty($name)) return null;
+
+        $name = $this->sanitizeName($name);
+        
         // gets all users with 'name' similar to $name
         $rows = $this->userModel->like('name', $name)
                             ->where('is_private', false)
@@ -93,14 +107,31 @@ public function authenticate(string $email, string $password): UserEntity|false
         return $sortedUsers;
     }
 
+    public function isNameAvailable(string $name, ?int $ignoreId = null): bool
+    {
+        if (empty($name)) return false;
+
+        $name = $this->sanitizeName($name);
+        
+        $query = $this->userModel->where('name', $name);
+        
+        if ($ignoreId !== null) {
+            $query->where('id !=', $ignoreId);
+        }
+
+        return $query->first() === null;
+    }
+
     public function createUser(UserEntity $userEntity): int|false
     {
         if ($this->userModel->where('email', $userEntity->getEmail())->first()) {
             return false;
         }
 
+        if(!$this->isNameAvailable($this->sanitizeName($userEntity->getName()))) return false;
+
         $data = [
-            'name' => $userEntity->getName(),
+            'name' => $this->sanitizeName($userEntity->getName()),
             'email' => $userEntity->getEmail(),
             'password' => $userEntity->getPassword(),
             'about' => $userEntity->getAbout(),
@@ -114,13 +145,19 @@ public function authenticate(string $email, string $password): UserEntity|false
 
     public function updateUser(int $id, array $data): bool
     {
+        if(empty($id) || empty($data)) return false;
+
         unset($data['password_confirm']);
         unset($data['email']);
+
+        $data['name'] = $this->sanitizeName($data['name']);
+
+        if(!$this->isNameAvailable($data['name'], $id)) return false;
 
         try {
             return (bool) $this->userModel->update($id, $data);
         } catch (\Throwable $e) {
-            error_log('[updateUser] ' . $e->getMessage());
+            log_message('error','[updateUser] ' . $e->getMessage());
             return false;
         }
     }
@@ -159,8 +196,14 @@ public function authenticate(string $email, string $password): UserEntity|false
         try {
             return $this->userModel->update($id_user, [$field => $value]);
         } catch (\Throwable $e) {
-            error_log("$context " . $e->getMessage());
+            log_message('error',"$context " . $e->getMessage());
             return false;
         }
     }
+
+    private function sanitizeName(string $name): string  // removes all whitespaces
+    {
+        return trim(preg_replace('/\s+/', '', $name));  
+    }
+
 }

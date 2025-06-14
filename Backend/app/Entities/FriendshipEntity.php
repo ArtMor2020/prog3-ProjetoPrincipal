@@ -10,8 +10,8 @@ class FriendshipEntity extends Entity
         'id_user1'       => null,    // who makes the request
         'id_user2'       => null,    // who recieves the request
         'status'         => null,    // 'friends' or 'friend_request'
-        'requested_at'   => null,
-        'friends_since'  => null,
+        'requested_at'   => null,   
+        'friends_since'  => null,   
     ];
 
     public function getIdUser1() {

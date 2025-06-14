@@ -18,13 +18,13 @@ class SearchService
         $this->postRepository = new PostRepository();
     }
 
-    public function search(string $query){
+    public function search(string $query /*, int $page*/){
         
         try{
             $result = [
-                'communities' => $this->communityRepository->getCommunitiesByName($query),
-                'users' => $this->userRepository->getUsersByName($query),
-                'posts' => $this->postRepository->getPostsByTitle($query)
+                'communities' => $this->communityRepository->searchByName($query /*, $page*/),
+                'users' => $this->userRepository->getUsersByName($query /*, $page*/),
+                'posts' => $this->postRepository->getPostsByTitle($query /*, $page*/)
         ];
         } catch (\Throwable $e) {
             log_message('error', '[SearchService->Search()] ' . $e->getMessage());

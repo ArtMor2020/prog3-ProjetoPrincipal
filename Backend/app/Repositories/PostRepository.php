@@ -66,8 +66,13 @@ class PostRepository
         return $sortedPosts;
     }
 
-    public function getPostsFromCommunityByPopularityInPeriod(int $communityId, string $period): array
+    public function getPostsFromCommunityByPopularityInPeriod(int $communityId, ?string $period = 'day', ?int $page = 1, ?int $postsPerPage = 30): array
     {
+        $page = max(1, $page);
+        $postsPerPage = max(1, $postsPerPage);
+
+        $offset = ($page - 1) * $postsPerPage;
+
         // $period must be one from bellow
         // gets the minimum date for the query based on $period
         $dateFrom = match ($period) {
@@ -96,24 +101,37 @@ class PostRepository
         }
 
         $builder->groupBy('post.id')
-            ->orderBy('score', 'DESC');
+            ->orderBy('score', 'DESC')
+            ->limit($postsPerPage, $offset);
 
         return $builder->get()->getResultArray();
     }
 
-    public function getRecommendedPostsForUser(int $userId): array
+    public function getRecommendedPostsForUser(int $userId, ?int $page = 1, ?int $postsPerPage = 30): array
     {
-        // get communities  where the user is a member and not banned
-        $db = \Config\Database::connect();
-        $builder = $db->table('user_in_community');
+        $page = max(1, $page);
+        $postsPerPage = max(1, $postsPerPage);
 
-        $subquery = $builder
+        $offset = ($page - 1) * $postsPerPage;        
+
+        $db = \Config\Database::connect();
+
+        // Get community IDs where user is a member and not banned
+        $communityIds = $db->table('user_in_community')
             ->select('id_community')
             ->where('id_user', $userId)
             ->where('is_banned', false)
-            ->getCompiledSelect();
+            ->get()
+            ->getResultArray();
 
-        // get posts from those communities with popularity score
+        // Extract flat array of community IDs
+        $communityIds = array_column($communityIds, 'id_community');
+
+        if (empty($communityIds)) {
+            return []; // no communities = no posts
+        }
+
+        // Build the query
         $postBuilder = $this->model->builder();
 
         $postBuilder->select('post.*, COALESCE(SUM(CASE WHEN rating_in_post.is_upvote = 1 THEN 1 ELSE -1 END), 0) AS score')
@@ -121,16 +139,21 @@ class PostRepository
             ->where('post.is_approved', 1)
             ->where('post.is_deleted', 0)
             ->where('post.posted_at >=', date('Y-m-d H:i:s', strtotime('-1 day')))
-            ->whereIn('post.id_community', $db->query($subquery)->getResultArray())
+            ->whereIn('post.id_community', $communityIds)
             ->groupBy('post.id')
-            ->orderBy('score', 'DESC');
+            ->orderBy('score', 'DESC')
+            ->limit($postsPerPage, $offset);
 
-        $posts = $postBuilder->get()->getResultArray();
-
-        return $posts;
+        return $postBuilder->get()->getResultArray();
     }
 
-    public function getPopularPosts(){  // gets posts popular today across all communities
+
+    public function getPopularPosts(?int $page = 1, ?int $postsPerPage = 30){  // gets posts popular today across all communities
+
+        $page = max(1, $page);
+        $postsPerPage = max(1, $postsPerPage);
+
+        $offset = ($page - 1) * $postsPerPage;
 
         $builder = $this->model->builder();
 
@@ -140,14 +163,15 @@ class PostRepository
             ->where('post.is_deleted', 0)
             ->where('post.posted_at >=', date('Y-m-d H:i:s', strtotime('-1 day')))
             ->groupBy('post.id')
-            ->orderBy('score', 'DESC');
+            ->orderBy('score', 'DESC')
+            ->limit($postsPerPage, $offset);
         
         $posts = $builder->get()->getResultArray();
-
-        return  $posts;
+        
+        return $posts;
     }
 
-    public function findById(int $id): ?PostEntity
+    public function findById(int $id)
     {
         return $this->model->find($id);
     }
@@ -157,14 +181,32 @@ class PostRepository
         try {
             return $this->model->insert($data, true);
         } catch (\Throwable $e) {
-            error_log('[PostRepository::createPost] ' . $e->getMessage());
+            log_message('error','[PostRepository::createPost] ' . $e->getMessage());
             return false;
         }
     }
 
+    public function getPendingPostsForCommunity(int $idCommunity, ?int $page = 1, ?int $postsPerPage = 30)
+    {
+        $page = max(1, $page);
+        $postsPerPage = max(1, $postsPerPage);
+
+        $offset = ($page - 1) * $postsPerPage;
+
+        return $this->model->where('id_community', $idCommunity)
+                            ->where('is_approved', 0)
+                            ->orderBy('posted_at', 'ASC')
+                            ->findAll($postsPerPage, $offset);
+    }
+
+    public function approvePost(int $idPost): bool
+    {
+        return (bool) $this->model->update($idPost, ['is_approved', true]);
+    }
+
     public function update(int $id, array $data): bool
     {
-        return $this->model->update($id, $data);
+        return (bool) $this->model->update($id, $data);
     }
 
     public function deletePost(int $id): bool
@@ -176,5 +218,16 @@ class PostRepository
         }
 
         return (bool) $this->model->update($id, ['is_deleted' => true]);
+    }
+
+    public function restorePost(int $id): bool
+    {
+        $post = $this->model->find($id);
+
+        if (!$post || !$post->getIsDeleted()) {
+            return false;
+        }
+
+        return (bool) $this->model->update($id, ['is_deleted' => false]);       
     }
 }

@@ -26,7 +26,6 @@ class CommunityRepository
 
     public function createCommunity(array $data): int|false
     {
-
         if ($this->model->where('name', $data['name'])->first()) {
             return false;
         }
@@ -71,7 +70,7 @@ class CommunityRepository
         try {
             return (bool) $this->model->update($id, [$field => $value]);
         } catch (\Throwable $e) {
-            error_log("$context " . $e->getMessage());
+            log_message('error', "$context " . $e->getMessage());
             return false;
         }
     }
@@ -81,12 +80,12 @@ class CommunityRepository
         return $this->model->where('id_owner', $ownerId)->findAll();
     }
 
-    public function searchByName(string $name): array
+    /*public function searchByName(string $name): array
     {
         return $this->model->like('name', $name)->findAll();
-    }
+    }*/
 
-    public function getCommunitiesByName(string $name): array
+    public function searchByName(string $name): array
     {
         // gets all users with 'name' similar to $name
         $rows = $this->model->like('name', $name)
