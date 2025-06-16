@@ -19,6 +19,11 @@ class DirectMessageRepository
         return $this->model->insert($data);
     }
 
+    public function getMessage(int $id): DirectMessageEntity|null
+    {
+        return $this->model->find( $id);
+    }
+
     public function getConversation(int $userA, int $userB): array
     {
         return $this->model->whereIn('id_sender', [$userA, $userB])

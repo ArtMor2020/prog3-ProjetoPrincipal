@@ -54,6 +54,28 @@ class UserInCommunityRepository
         }
     }
 
+    public function inviteUserToCommunity(int $communityId, int $userId): bool
+    {
+        $isAlreadyInvitedMemberOrBanned = (bool) $this->model
+            ->groupStart()
+                ->where('id_user', $userId)
+                ->where('id_community', $communityId)
+                ->whereIn('role', ['member', 'invited'])
+            ->groupEnd()
+            ->orWhere('is_banned', true)
+            ->first();
+        
+        if( $isAlreadyInvitedMemberOrBanned ) return false;
+
+        return $this->addMember($communityId, $userId, 'invited');
+    }
+
+    public function acceptInvite(int $communityId, int $userId)
+    {
+        return $this->updateRole($communityId, $userId, 'member');
+    }
+
+
     public function banMember(int $communityId, int $userId): bool
     {
         return (bool) $this->model
@@ -76,6 +98,14 @@ class UserInCommunityRepository
     {
         return $this->model
             ->where('id_community', $communityId)
+            ->findAll();
+    }
+
+    public function listAdministratorsByCommunity(int $communityId)
+    {
+        return $this->model
+            ->where('id_community', $communityId)
+            ->whereIn('role', ['ADMIN', 'MODERATOR'])
             ->findAll();
     }
 

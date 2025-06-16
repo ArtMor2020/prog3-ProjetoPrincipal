@@ -274,6 +274,52 @@ class FriendshipSeeder extends Seeder
     }
 }
 
+class NotificationSeeder extends Seeder
+{
+    public function run()
+    {
+        $data = [
+            [
+                'id_user'    => 1,
+                'status'     => 'not_seen',
+                'event_date' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+                'type'       => 'mention_in_post',
+                'id_origin'  => 1, // post id
+            ],
+            [
+                'id_user'    => 2,
+                'status'     => 'seen',
+                'event_date' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+                'type'       => 'friend_request',
+                'id_origin'  => 1, // user id
+            ],
+            [
+                'id_user'    => 3,
+                'status'     => 'not_seen',
+                'event_date' => date('Y-m-d H:i:s', strtotime('-30 minutes')),
+                'type'       => 'message',
+                'id_origin'  => 2, // user id
+            ],
+            [
+                'id_user'    => 1,
+                'status'     => 'seen',
+                'event_date' => date('Y-m-d H:i:s', strtotime('-3 days')),
+                'type'       => 'invite',
+                'id_origin'  => 1, // community id
+            ],
+            [
+                'id_user'    => 2,
+                'status'     => 'not_seen',
+                'event_date' => date('Y-m-d H:i:s', strtotime('-6 hours')),
+                'type'       => 'mention_in_comment',
+                'id_origin'  => 1, // comment id
+            ],
+        ];
+
+        $this->db->table('notification')->insertBatch($data);
+    }
+}
+
 class DatabaseSeeder extends Seeder
 {
     public function run()
@@ -294,5 +340,6 @@ class DatabaseSeeder extends Seeder
         $this->call('App\Database\Seeds\AttachmentInCommentSeeder');
         $this->call('App\Database\Seeds\RatingInCommentSeeder');
         $this->call('App\Database\Seeds\FriendshipSeeder');
+        $this->call('App\Database\Seeds\NotificationSeeder');
     }
 }
