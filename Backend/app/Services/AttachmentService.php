@@ -37,6 +37,29 @@ class AttachmentService
         return $this->attachmentRepository->create($fileData) ?: null;
     }
 
+    public function getFile(int $attachmentId): array
+    {
+        // Fetch attachment by ID
+        $attachment = $this->attachmentRepository->findById($attachmentId);
+
+        if (!$attachment || $attachment->getIsDeleted()) {
+            throw new \RuntimeException('File not found or has been deleted.');
+        }
+
+        $filePath = $attachment->getPath();
+
+        if (!file_exists($filePath)) {
+            throw new \RuntimeException('File does not exist on server.');
+        }
+
+        return [
+            'name'     => basename($filePath),
+            'type'     => $attachment->getType(),
+            'size'     => filesize($filePath),
+            'content'  => file_get_contents($filePath)
+        ];
+    }
+
     public function getExtensionType(string $EXT): string
     {
         $EXT = strtolower($EXT);

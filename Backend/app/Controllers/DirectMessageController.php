@@ -4,15 +4,18 @@ namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\DirectMessageRepository;
+use App\Services\DirectMessageService;
 
 class DirectMessageController extends ResourceController
 {
     protected $format = 'json';
     protected DirectMessageRepository $repository;
+    protected DirectMessageService $directMessageService;
 
     public function __construct()
     {
         $this->repository = new DirectMessageRepository();
+        $this->directMessageService = new DirectMessageService();
     }
 
     /**
@@ -34,7 +37,7 @@ class DirectMessageController extends ResourceController
             'sent_at'     => date('Y-m-d H:i:s'),
         ];
 
-        $id = $this->repository->sendMessage($insert);
+        $id = $this->directMessageService->sendMessage($insert);
 
         if (! $id) {
             return $this->fail('Falha ao enviar mensagem.', 500);

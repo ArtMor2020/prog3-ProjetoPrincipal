@@ -184,6 +184,14 @@ $routes->group('friendship', function($routes) {
     $routes->get('friends/(:num)',    'FriendshipController::getFriends/$1');
 });
 
+// ------- NOTIFICATION --------
+$routes->group('notification', function($routes) {
+    $routes->get('formatted/(:num)',  'NotificationController::formattedNotifications/$1');
+    $routes->put('clear/(:num)',      'NotificationController::clearNotification/$1');
+    $routes->put('clear_all/(:num)',  'NotificationController::clearAllNotifications/$1');
+    $routes->delete('delete/(:num)',  'NotificationController::delete/$1');
+});
+
 if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php')) {
     require APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php';
 }

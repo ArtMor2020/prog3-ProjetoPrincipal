@@ -20,6 +20,11 @@ class PostRepository
         return $this->model->findAll();
     }
 
+    public function getPost(int $id): PostEntity|null
+    {
+        return $this->model->find( $id);
+    }
+
     public function findAllByCommunity(int $communityId): array
     {
         return $this->model

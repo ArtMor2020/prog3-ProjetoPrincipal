@@ -3,14 +3,17 @@
 namespace App\Controllers;
 
 use App\Repositories\FriendshipRepository;
+use App\Services\FriendshipService;
 use CodeIgniter\RESTful\ResourceController;
 
 class FriendshipController extends ResourceController
 {
     protected FriendshipRepository $friendshipRepository;
+    protected FriendshipService $friendshipService;
 
     public function __construct(){
         $this->friendshipRepository = New FriendshipRepository();
+        $this->friendshipService = new FriendshipService();
     }
 
     public function sendRequest()
@@ -22,7 +25,7 @@ class FriendshipController extends ResourceController
                 return $this->failValidationError('Campos id_user1 e id_user2 são obrigatórios.');
         }
 
-        $id = $this->friendshipRepository->createFriendRequest($data['id_user1'], $data['id_user2']);
+        $id = $this->friendshipService->createFriendRequest($data['id_user1'], $data['id_user2']);
 
         if ($id === false) {
             return $this->fail('Não foi possível enviar o pedido.', 400);

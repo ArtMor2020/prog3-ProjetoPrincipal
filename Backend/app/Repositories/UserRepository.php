@@ -35,25 +35,25 @@ class UserRepository
         }
     }
 
-public function authenticate(string $email, string $password): UserEntity|false
-{
-    // Busca a entidade (ou null)
-    $user = $this->userModel
-                 ->where('email', $email)
-                 ->where('is_deleted', false)
-                 ->first();
+    public function authenticate(string $email, string $password): UserEntity|false
+    {
+        // Busca a entidade (ou null)
+        $user = $this->userModel
+                    ->where('email', $email)
+                    ->where('is_deleted', false)
+                    ->first();
 
-    // Se não existir ou a senha não corresponder
-    if (! $user instanceof UserEntity || ! password_verify($password, $user->getPassword())) {
-        return false;
+        // Se não existir ou a senha não corresponder
+        if (! $user instanceof UserEntity || ! password_verify($password, $user->getPassword())) {
+            return false;
+        }
+
+        // Opcional: remover o hash antes de retornar
+        $user->setPassword(''); 
+
+        return $user;
     }
-
-    // Opcional: remover o hash antes de retornar
-    $user->setPassword(''); 
-
-    return $user;
-}
-public function getUserByName(string $name): array|null
+    public function getUserByName(string $name): array|null
     {
         if (empty($name)) return null;
 
