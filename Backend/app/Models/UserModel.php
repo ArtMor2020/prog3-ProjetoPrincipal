@@ -9,7 +9,7 @@ class UserModel extends Model
     protected $table = 'user';
     protected $primaryKey = 'id';
     protected $returnType = UserEntity::class;
-    
+
 
     protected $allowedFields = [
         'name',

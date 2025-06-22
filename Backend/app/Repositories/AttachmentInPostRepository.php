@@ -1,59 +1,53 @@
 <?php
+
 namespace App\Repositories;
 
-use CodeIgniter\Database\ConnectionInterface;
-use Config\Database;
+use App\Models\AttachmentInPostModel;
+use Throwable;
 
 class AttachmentInPostRepository
 {
-    private ConnectionInterface $db;
-    private string $table = 'attachment_in_post';
+    private AttachmentInPostModel $model;
 
     public function __construct()
     {
-        $this->db = Database::connect();
+        $this->model = new AttachmentInPostModel();
     }
 
     public function findAll(): array
     {
-        return $this->db
-            ->table($this->table)
-            ->get()
-            ->getResultArray();
+        return $this->model->findAll();
     }
 
     public function find(int $postId, int $attachmentId): ?array
     {
-        return $this->db
-            ->table($this->table)
+        return $this->model
             ->where('id_post', $postId)
             ->where('id_attachment', $attachmentId)
-            ->get()
-            ->getFirstRow('array');
+            ->first();
+    }
+
+    public function findAttachmentsInPost(int $postId): array
+    {
+        return $this->model->where('id_post', $postId)->findAll();
     }
 
     public function create(int $postId, int $attachmentId): bool
     {
-        $builder = $this->db->table($this->table);
-
-        if (
-            $builder->where('id_post', $postId)
-                ->where('id_attachment', $attachmentId)
-                ->countAllResults() > 0
-        ) {
+        try {
+            return (bool) $this->model->builder()->insert([
+                'id_post' => $postId,
+                'id_attachment' => $attachmentId,
+            ]);
+        } catch (Throwable $e) {
+            log_message('error', '[AttachmentInPostRepository::create] ' . $e->getMessage());
             return false;
         }
-
-        return (bool) $builder->insert([
-            'id_post' => $postId,
-            'id_attachment' => $attachmentId,
-        ]);
     }
 
     public function delete(int $postId, int $attachmentId): bool
     {
-        return (bool) $this->db
-            ->table($this->table)
+        return (bool) $this->model->builder()
             ->where('id_post', $postId)
             ->where('id_attachment', $attachmentId)
             ->delete();

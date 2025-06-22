@@ -8,7 +8,9 @@ use App\Entities\RatingInPostEntity;
 class RatingInPostModel extends Model
 {
     protected $table = 'rating_in_post';
+
     protected $primaryKey = ['id_post', 'id_user'];
+
     protected $useAutoIncrement = false;
     protected $returnType = RatingInPostEntity::class;
 

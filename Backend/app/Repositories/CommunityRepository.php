@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\CommunityModel;
 use App\Entities\CommunityEntity;
+use Throwable;
 
 class CommunityRepository
 {
@@ -26,11 +27,28 @@ class CommunityRepository
 
     public function createCommunity(array $data): int|false
     {
-        if ($this->model->where('name', $data['name'])->first()) {
+        $normalizedNewName = strtolower(trim($data['name']));
+
+        $existingCommunity = $this->model->where('name', $data['name'])->first();
+
+        if ($existingCommunity) {
+            $errorMessage = sprintf(
+                "Conflito de nome de comunidade. Tentativa de criar: '%s'. Nome já existente no BD: '%s' (ID: %d).",
+                $data['name'],
+                $existingCommunity->getName(),
+                $existingCommunity->getId()
+            );
+            log_message('error', $errorMessage);
+
             return false;
         }
 
-        return $this->model->insert($data, true);
+        try {
+            return $this->model->insert($data, true);
+        } catch (Throwable $e) {
+            log_message('error', '[CommunityRepository::createCommunity] Exceção na inserção: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function updateCommunity(int $id, array $data): bool
@@ -80,43 +98,35 @@ class CommunityRepository
         return $this->model->where('id_owner', $ownerId)->findAll();
     }
 
-    /*public function searchByName(string $name): array
-    {
-        return $this->model->like('name', $name)->findAll();
-    }*/
-
     public function searchByName(string $name): array
     {
         // gets all users with 'name' similar to $name
         $rows = $this->model->like('name', $name)
-                            ->where('is_banned', false)
-                            ->where('is_deleted', false)
-                            ->findAll();
+            ->where('is_banned', false)
+            ->where('is_deleted', false)
+            ->findAll();
         $communities = [];
 
-        // finds how similar the 'name' and $name are using levenshtein distance
-        foreach($rows as $row){
-            
-            $levenshteinDistance = levenshtein($name, $row->getName()); // find how well the name matches the search
+        foreach ($rows as $row) {
+
+            $levenshteinDistance = levenshtein($name, $row->getName());
             $maxLength = max(strlen($name), strlen($row->getName()));
-            
+
             $matchPercentage = $maxLength == 0 ? 100 : (1 - ($levenshteinDistance / $maxLength)) * 100;
-            
+
             $communities[] = [
                 'community' => $row,
                 'matchPercentage' => round($matchPercentage, 2)
             ];
         }
-        
-        // sorts by similarity
-        usort($communities, function($a, $b) {
-            return $b['matchPercentage'] - $a['matchPercentage']; 
+
+        usort($communities, function ($a, $b) {
+            return $b['matchPercentage'] - $a['matchPercentage'];
         });
 
         $sortedCommunities = [];
 
-        // extracts user model from array
-        foreach($communities as $community){
+        foreach ($communities as $community) {
             $sortedCommunities[] = $community['community']->toArray();
         }
 

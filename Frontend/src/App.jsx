@@ -1,16 +1,27 @@
-// src/App.jsx
-import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
-import './App.css';
-import LoginPage    from './pages/Login';
-import RegisterPage from './pages/Register';
-import HomePage     from './pages/HomePage';
-import PostPage     from './pages/PostPage';
-import UserPage     from './pages/UserPage';
-import CommunityPage from './pages/CommunityPage';
-import { useUser }  from './contexts/UserContext';
-import PostCreate from './pages/PostCreate';
-import CommunityCreatePage from './pages/CommunityCreatePage';
+import React from "react";
+import { Switch, Route, Redirect } from "react-router-dom";
+import "./App.css";
+import LoginPage from "./pages/Login";
+import RegisterPage from "./pages/Register";
+import HomePage from "./pages/HomePage";
+import PostPage from "./pages/PostPage";
+import UserPage from "./pages/UserPage";
+import CommunityPage from "./pages/CommunityPage";
+import { useUser } from "./contexts/UserContext";
+import PostCreate from "./pages/PostCreate";
+import CommunityCreatePage from "./pages/CommunityCreatePage";
+import ChatBar from "./components/ChatBar";
+import SearchResultsPage from "./pages/SearchResultsPage";
+
+function MainLayout({ children }) {
+  const { user } = useUser();
+  return (
+    <>
+      {children}
+      {user && <ChatBar />}
+    </>
+  );
+}
 
 function PrivateRoute({ children, ...rest }) {
   const { user } = useUser();
@@ -18,9 +29,7 @@ function PrivateRoute({ children, ...rest }) {
     <Route
       {...rest}
       render={() =>
-        user
-          ? children
-          : <Redirect to="/login" />
+        user ? <MainLayout>{children}</MainLayout> : <Redirect to="/login" />
       }
     />
   );
@@ -40,7 +49,6 @@ export default function App() {
         <HomePage />
       </PrivateRoute>
 
-      {/* Rotas dinâmicas */}
       <PrivateRoute exact path="/posts/:postId">
         <PostPage />
       </PrivateRoute>
@@ -61,7 +69,10 @@ export default function App() {
         <CommunityCreatePage />
       </PrivateRoute>
 
-      {/* Se nada casar */}
+      <PrivateRoute path="/search-results">
+        <SearchResultsPage />
+      </PrivateRoute>
+
       <Route>
         <Redirect to="/home" />
       </Route>

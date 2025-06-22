@@ -74,8 +74,8 @@ class RatingInPostRepository
     {
         try {
             return $this->model->where('id_post', $postId)
-                            ->where('id_user', $userId)
-                            ->delete();
+                ->where('id_user', $userId)
+                ->delete();
         } catch (\Throwable $e) {
             log_message('error', '[removeVote] ' . $e->getMessage());
             return false;

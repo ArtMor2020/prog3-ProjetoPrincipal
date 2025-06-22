@@ -4,16 +4,18 @@ namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\CommunityRepository;
-use ProjectForum\app\Entities\CommunityEntity;
+use App\Services\CommunityService;
 
 class CommunityController extends ResourceController
 {
     protected $format = 'json';
     protected CommunityRepository $repository;
+    protected CommunityService $service;
 
     public function __construct()
     {
         $this->repository = new CommunityRepository();
+        $this->service = new CommunityService();
     }
 
     public function index()
@@ -57,9 +59,8 @@ class CommunityController extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
-
         if (empty($data['name']) || empty($data['description']) || empty($data['id_owner'])) {
-            return $this->failValidationError('name, description and id_owner are required.');
+            return $this->failValidationError('name, description e id_owner são obrigatórios.');
         }
 
         $payload = [
@@ -69,13 +70,14 @@ class CommunityController extends ResourceController
             'is_private' => (bool) ($data['is_private'] ?? false),
         ];
 
-        $id = $this->repository->createCommunity($payload);
+        $id = $this->service->createCommunity($payload);
 
         if ($id === false) {
-            return $this->fail('Community name already exists.', 409);
+            return $this->fail('Não foi possível criar a comunidade. O nome pode já existir.', 409);
         }
 
         return $this->respondCreated(['id' => $id]);
+        // -------------------------
     }
     public function update($id = null)
     {
@@ -152,5 +154,25 @@ class CommunityController extends ResourceController
         return $success
             ? $this->respond(['status' => 'restored'])
             : $this->fail('Restore failed', 500);
+    }
+
+    public function userStatus($communityId, $userId)
+    {
+        $userInCommunityRepo = new \App\Repositories\UserInCommunityRepository();
+        $joinRequestRepo = new \App\Repositories\CommunityJoinRequestRepository();
+
+        $membership = $userInCommunityRepo->getMembership((int) $communityId, (int) $userId);
+        if ($membership) {
+            if ($membership->is_banned)
+                return $this->respond(['status' => 'banned']);
+            return $this->respond(['status' => $membership->role]);
+        }
+
+        $request = $joinRequestRepo->getPendingRequest((int) $communityId, (int) $userId);
+        if ($request) {
+            return $this->respond(['status' => 'request_sent']);
+        }
+
+        return $this->respond(['status' => 'not_member']);
     }
 }

@@ -70,9 +70,9 @@ class RatingInCommentRepository
     {
         try {
             return $this->db->table($this->table)
-                            ->where('id_comment', $commentId)
-                            ->where('id_user', $userId)
-                            ->delete();
+                ->where('id_comment', $commentId)
+                ->where('id_user', $userId)
+                ->delete();
         } catch (\Throwable $e) {
             log_message('error', '[removeVote] ' . $e->getMessage());
             return false;

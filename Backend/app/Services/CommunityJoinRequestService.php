@@ -4,44 +4,68 @@ namespace App\Services;
 
 use App\Repositories\CommunityJoinRequestRepository;
 use App\Repositories\UserInCommunityRepository;
-use App\Entities\CommunityJoinRequestEntity;
+use App\Repositories\NotificationRepository;
+use Throwable;
 
 class CommunityJoinRequestService
 {
     protected CommunityJoinRequestRepository $communityJoinRequestRepository;
     protected UserInCommunityRepository $userInCommunityRepository;
+    protected NotificationRepository $notificationRepository;
 
     public function __construct()
     {
         $this->communityJoinRequestRepository = new CommunityJoinRequestRepository();
         $this->userInCommunityRepository = new UserInCommunityRepository();
+        // --- CORREÇÃO APLICADA AQUI ---
+        $this->notificationRepository = new NotificationRepository();
+        // --------------------------------
     }
 
     public function makeRequest(int $communityId, int $userId)
     {
-        return $this->communityJoinRequestRepository->create($communityId, $userId);
+        $requestId = $this->communityJoinRequestRepository->create($communityId, $userId);
+
+        if (!$requestId) {
+            return false;
+        }
+
+        try {
+            $admins = $this->userInCommunityRepository->listAdministratorsByCommunity($communityId);
+            foreach ($admins as $admin) {
+                $originId = $userId;
+                if (!$this->notificationRepository->existsUnreadNotification($admin->getIdUser(), $originId, 'community_join_request')) {
+                    $this->notificationRepository->notifyUser($admin->getIdUser(), 'community_join_request', $originId);
+                }
+            }
+        } catch (Throwable $e) {
+            log_message('error', '[CommunityJoinRequestService] Falha ao notificar admins: ' . $e->getMessage());
+        }
+
+        return $requestId;
     }
 
-    public function acceptRequest(int $idRequest)
+    public function acceptRequest(int $requestId)
     {
-        try{
-            $this->communityJoinRequestRepository->approve($idRequest);
-            
-            $data = $this->communityJoinRequestRepository->getRequest($idRequest);
+        try {
+            $request = $this->communityJoinRequestRepository->getRequest($requestId);
+            if (!$request) {
+                return false;
+            }
 
-            $this->userInCommunityRepository->addMember($data['id_community'], $data['id_user']);
+            $this->communityJoinRequestRepository->approve($requestId);
+
+            $this->userInCommunityRepository->addMember($request->id_community, $request->id_user);
 
             return true;
-
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             log_message('error', 'CommunityJoinRequestService::acceptRequest - ' . $e->getMessage());
-
             return false;
         }
     }
-    
-    public function rejectRequest(int $idRequest)
+
+    public function rejectRequest(int $requestId): bool
     {
-        return $this->communityJoinRequestRepository->reject($idRequest);
+        return $this->communityJoinRequestRepository->reject($requestId);
     }
 }
