@@ -2,123 +2,134 @@
 
 namespace App\Services;
 
-use App\Database\Migrations\Attachment;
-use App\Database\Migrations\AttachmentInPost;
-use App\Database\Migrations\RatingInPost;
 use App\Repositories\PostRepository;
-use App\Entities\PostEntity;
 use App\Repositories\AttachmentInPostRepository;
 use App\Repositories\AttachmentRepository;
 use App\Repositories\NotificationRepository;
-use App\Repositories\RatingInPostRepository;
 use App\Repositories\UserInCommunityRepository;
 use App\Repositories\UserRepository;
 use CodeIgniter\HTTP\Files\UploadedFile;
+use Throwable;
 
 class PostService
 {
     protected PostRepository $postRepository;
-    protected RatingInPostRepository $ratingInPostRepository;
-    protected AttachmentRepository $attachmentRepository;
     protected AttachmentInPostRepository $attachmentInPostRepository;
+    protected AttachmentRepository $attachmentRepository;
     protected AttachmentService $attachmentService;
     protected UserInCommunityRepository $userInCommunityRepository;
     protected NotificationRepository $notificationRepository;
     protected UserRepository $userRepository;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->postRepository = new PostRepository();
-        $this->ratingInPostRepository = new RatingInPostRepository();
-        $this->attachmentRepository = new AttachmentRepository();
         $this->attachmentInPostRepository = new AttachmentInPostRepository();
+        $this->attachmentRepository = new AttachmentRepository();
         $this->attachmentService = new AttachmentService();
         $this->userInCommunityRepository = new UserInCommunityRepository();
+        $this->notificationRepository = new NotificationRepository();
+        $this->userRepository = new UserRepository();
     }
 
-    public function submitPost(array $post, ?UploadedFile ...$files){
+    public function submitPost(array $post, ?UploadedFile ...$files)
+    {
+        if (empty($post) || empty($post['id_user']))
+            return false;
 
-        if(empty($post)) return false;
+        $communityId = !empty($post['id_community']) ? (int) $post['id_community'] : null;
 
-        // Garante posted_at correto
-        $post['posted_at'] = date('Y-m-d H:i:s');
+        $postData = [
+            'id_user' => (int) $post['id_user'],
+            'id_community' => $communityId,
+            'title' => $post['title'],
+            'description' => $post['description'] ?? '',
+            'is_approved' => ($communityId === null),
+            'is_deleted' => false,
+            'posted_at' => date('Y-m-d H:i:s'),
+        ];
 
-        // add post to db
-        $postId = $this->postRepository->createPost($post);
-        $attachmentIds = [];
+        $postId = $this->postRepository->createPost($postData);
+        if (!$postId) {
+            log_message('error', '[PostService] Falha ao criar post no repositório.');
+            return false;
+        }
 
-        // checks if there are any attachments
-        if($files !== null)
-        {
-            // saves file to disk and add attachment to db
-            foreach($files as $file){
-                $attachmentIds[] = $this->attachmentService->uploadFile($file);
-            }
-
-            // add relation of post and attachments to db
-            foreach($attachmentIds as $attachmentId){
-                $this->attachmentInPostRepository->create($postId, $attachmentId);
+        if ($files !== null) {
+            foreach ($files as $file) {
+                if ($file && $file->isValid()) {
+                    $attachmentId = $this->attachmentService->uploadFile($file);
+                    if ($attachmentId) {
+                        $this->attachmentInPostRepository->create($postId, $attachmentId);
+                    }
+                }
             }
         }
 
-        // makes notification to community administrators
-        $admins = $this->userInCommunityRepository->listAdministratorsByCommunity($post['id_community']);
-
-        foreach ($admins as $admin)
-        {
-            if( !$this->notificationRepository->existsUnreadNotification(
-                $admin['id_user'], 
-                $post['id_community'], 
-                'pending_post'))
-            {
-                $this->notificationRepository->notifyUser(
-                    $admin['id_user'], 
-                    'pending_post', 
-                    $post['id_community']);
+        try {
+            if ($communityId) {
+                $admins = $this->userInCommunityRepository->listAdministratorsByCommunity($communityId);
+                foreach ($admins as $admin) {
+                    $adminId = $admin->getIdUser();
+                    if (!$this->notificationRepository->existsUnreadNotification($adminId, $communityId, 'pending_post')) {
+                        $this->notificationRepository->notifyUser($adminId, 'pending_post', $communityId);
+                    }
+                }
             }
-        }
 
-        // makes notifications for mentions
-        $namesMentioned = array_unique(array_merge(
-            $this->getMentions($post['title']),
-            $this->getMentions($post['description'])
-        ));
-
-        foreach ($namesMentioned as $name) 
-        {
-            $user = $this->userRepository->getUserByName($name);
-
-            if ($user && 
-                !$this->notificationRepository->existsUnreadNotification(
-                    $user['id'], $postId, 'mention_in_post')
-                )
-            {
-                $this->notificationRepository->notifyUser(
-                    $user['id'], 
-                    'mention_in_post', 
-                    $postId
-                );
+            $fullText = ($post['title'] ?? '') . ' ' . ($post['description'] ?? '');
+            $namesMentioned = array_unique($this->getMentions($fullText));
+            foreach ($namesMentioned as $name) {
+                $user = $this->userRepository->getUserByName($name);
+                if ($user) {
+                    $mentionedUserId = $user->getId();
+                    if (!$this->notificationRepository->existsUnreadNotification($mentionedUserId, $postId, 'mention_in_post')) {
+                        $this->notificationRepository->notifyUser($mentionedUserId, 'mention_in_post', $postId);
+                    }
+                }
             }
+        } catch (Throwable $e) {
+            log_message('error', '[PostService] Falha não fatal na lógica de notificação: ' . $e->getMessage());
         }
 
         return $postId;
     }
 
-    // call as [$post, $files] = $this->postServiçe->getPost($postId);
     public function getPost(int $postId)
     {
-        // get post
-        $post = $this->postRepository->getPost($postId);
+        try {
+            $post = $this->postRepository->findById($postId);
+            if (!$post) {
+                log_message('error', "[PostService::getPost] Post com ID {$postId} não encontrado.");
+                return [null, []];
+            }
 
-        // get attachments
-        $attachments = $this->attachmentInPostRepository->findAttachmentsInPost($postId);
-        $files = [];
+            $attachmentsInPost = $this->attachmentInPostRepository->findAttachmentsInPost($postId);
 
-        foreach ($attachments as $attachment)
-        {
-            $files[] = $this->attachmentService->getFile($attachment['id_attachment']);
+            $attachmentDetails = [];
+            foreach ($attachmentsInPost as $attachmentLink) {
+                if (!$attachmentLink) {
+                    log_message('warning', "[PostService::getPost] Encontrado um attachmentLink nulo para o post {$postId}.");
+                    continue;
+                }
+
+                $attachment = $this->attachmentRepository->findById($attachmentLink->getIdAttachment());
+                if ($attachment) {
+                    $attachmentDetails[] = [
+                        'id' => $attachment->getId(),
+                        'type' => $attachment->getType()
+                    ];
+                } else {
+                    log_message('warning', "[PostService::getPost] Anexo com ID {$attachmentLink->getIdAttachment()} não encontrado, mas link existe para o post {$postId}.");
+                }
+            }
+
+            return [$post, $attachmentDetails];
+
+        } catch (Throwable $e) {
+            log_message('error', "[PostService::getPost] Exceção ao buscar post ID {$postId}: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return [null, []];
         }
-
-        return [$post, $files];
     }
 
     private function getMentions(string $text): array

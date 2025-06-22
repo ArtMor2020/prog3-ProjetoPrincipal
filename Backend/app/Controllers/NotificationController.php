@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Controllers;
+
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\NotificationRepository;
 use App\Services\NotificationService;
@@ -15,7 +17,7 @@ class NotificationController extends ResourceController
         $this->notificationService = new NotificationService();
     }
 
-    public function index($userId = null) // just for testing
+    public function index($userId = null)
     {
         $notifications = $userId
             ? $this->notificationRepository->findNotificationsForUser($userId)
@@ -24,7 +26,7 @@ class NotificationController extends ResourceController
         return $this->respond($notifications);
     }
 
-    public function formattedNotifications(int $userId) // returns formated notifications
+    public function formattedNotifications(int $userId)
     {
         $notifications = $this->notificationService->getNotifications($userId);
 
@@ -47,8 +49,7 @@ class NotificationController extends ResourceController
 
     public function delete($id = null)
     {
-        if ($this->notificationRepository->delete((int) $id))
-        {
+        if ($this->notificationRepository->delete((int) $id)) {
             return $this->respondDeleted(['status' => 'deleted']);
         }
 

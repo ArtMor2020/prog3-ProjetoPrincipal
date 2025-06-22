@@ -9,6 +9,14 @@ class Friendship extends Migration
     public function up()
     {
         $this->forge->addField([
+            // --- CAMPO ADICIONADO ---
+            'id' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
+                'auto_increment' => true,
+            ],
+            // ------------------------
             'id_user1' => [
                 'type' => 'INT',
                 'constraint' => 11,
@@ -19,7 +27,7 @@ class Friendship extends Migration
                 'constraint' => 11,
                 'unsigned' => true,
             ],
-            'status' => [               // 'friends' or 'friend_request'
+            'status' => [
                 'type' => 'VARCHAR',
                 'constraint' => 16,
             ],
@@ -33,7 +41,12 @@ class Friendship extends Migration
             ],
         ]);
 
-        $this->forge->addPrimaryKey(['id_user1', 'id_user2']);
+        // --- CHAVE PRIMÁRIA MODIFICADA ---
+        $this->forge->addKey('id', true); 
+        // Adicionamos um índice único para garantir que não haja pedidos duplicados
+        $this->forge->addUniqueKey(['id_user1', 'id_user2']);
+        // ---------------------------------
+        
         $this->forge->addForeignKey('id_user1', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('id_user2', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('friendship');

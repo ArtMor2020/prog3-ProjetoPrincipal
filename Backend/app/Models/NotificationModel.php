@@ -6,10 +6,10 @@ use App\Entities\NotificationEntity;
 
 class NotificationModel extends Model
 {
-    protected $table            = 'notification';
-    protected $primaryKey       = 'id';
+    protected $table = 'notification';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = NotificationEntity::class;
+    protected $returnType = NotificationEntity::class;
 
     protected $allowedFields = [
         'id_user',

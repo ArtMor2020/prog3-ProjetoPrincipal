@@ -11,18 +11,37 @@ class FriendshipController extends ResourceController
     protected FriendshipRepository $friendshipRepository;
     protected FriendshipService $friendshipService;
 
-    public function __construct(){
-        $this->friendshipRepository = New FriendshipRepository();
+    public function __construct()
+    {
+        $this->friendshipRepository = new FriendshipRepository();
         $this->friendshipService = new FriendshipService();
+    }
+
+    public function getStatus($userA, $userB)
+    {
+        $friendship = $this->friendshipRepository->findFriendshipBetweenUsers((int) $userA, (int) $userB);
+
+        if (!$friendship) {
+            return $this->respond(['status' => 'not_friends']);
+        }
+
+        if ($friendship->status === 'friends') {
+            return $this->respond(['status' => 'friends']);
+        }
+
+        if ($friendship->id_user1 == $userA) {
+            return $this->respond(['status' => 'request_sent']);
+        } else {
+            return $this->respond(['status' => 'request_received', 'request_id' => $friendship->id]);
+        }
     }
 
     public function sendRequest()
     {
         $data = $this->request->getJSON(true);
 
-        if( empty($data['id_user1']) || empty($data['id_user2']) )
-        {
-                return $this->failValidationError('Campos id_user1 e id_user2 são obrigatórios.');
+        if (empty($data['id_user1']) || empty($data['id_user2'])) {
+            return $this->failValidationError('Campos id_user1 e id_user2 são obrigatórios.');
         }
 
         $id = $this->friendshipService->createFriendRequest($data['id_user1'], $data['id_user2']);

@@ -22,9 +22,9 @@ class NotificationRepository
     public function findNotificationsForUser(int $userId)
     {
         return $this->notificationModel->where('id_user', $userId)
-                                        ->where('status', 'not_seen')
-                                        ->orderBy('event_date', 'DESC')
-                                        ->findAll();
+            ->where('status', 'not_seen')
+            ->orderBy('event_date', 'DESC')
+            ->findAll();
     }
 
     public function notifyUser(int $userId, string $type, int $originId): bool|int
@@ -43,11 +43,11 @@ class NotificationRepository
     public function existsUnreadNotification(int $userId, int $originId, string $type): bool
     {
         return $this->notificationModel->where([
-                'id_user'   => $userId,
-                'id_origin' => $originId,
-                'type'      => $type,
-                'status'    => 'not_seen'
-            ])
+            'id_user' => $userId,
+            'id_origin' => $originId,
+            'type' => $type,
+            'status' => 'not_seen'
+        ])
             ->countAllResults() > 0;
     }
 

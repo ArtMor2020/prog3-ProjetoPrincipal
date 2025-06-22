@@ -18,16 +18,18 @@ class InviteService
 
     function inviteUserToCommunity(int $userId, int $communityId): bool
     {
-        if ( !$this->notificationRepository->existsUnreadNotification(
-            $userId, 
-            $communityId, 
-            'invite'
-        ))
-        {
+        if (
+            !$this->notificationRepository->existsUnreadNotification(
+                $userId,
+                $communityId,
+                'invite'
+            )
+        ) {
             $this->notificationRepository->notifyUser(
-                $userId, 
-                'invite', 
-                $communityId);
+                $userId,
+                'invite',
+                $communityId
+            );
         }
 
         return $this->userInCommunityRepository->inviteUserToCommunity($communityId, $userId);

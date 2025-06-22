@@ -8,6 +8,7 @@ use App\Entities\AttachmentInPostEntity;
 class AttachmentInPostModel extends Model
 {
     protected $table = 'attachment_in_post';
+
     protected $primaryKey = ['id_attachment', 'id_post'];
 
     protected $useAutoIncrement = false;

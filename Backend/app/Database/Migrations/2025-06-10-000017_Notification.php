@@ -19,7 +19,7 @@ class Notification extends Migration
                 'constraint' => 11,
                 'unsigned' => true,
             ],
-            'status' => [               // 'seen' or 'not_seen'
+            'status' => [
                 'type' => 'VARCHAR',
                 'constraint' => 16,
             ],
@@ -27,12 +27,11 @@ class Notification extends Migration
                 'type' => 'DATETIME',
                 'null' => false,
             ],
-            'type' => [                // mention, message, pending_post, friend_request
+            'type' => [
                 'type' => 'VARCHAR',
                 'constraint' => 50,
-                'unsigned' => true,
             ],
-            'id_origin' => [           // id of post, comment, person messaging, community with pending post, etc
+            'id_origin' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'unsigned' => true,

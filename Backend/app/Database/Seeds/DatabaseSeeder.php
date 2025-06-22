@@ -280,35 +280,35 @@ class NotificationSeeder extends Seeder
     {
         $data = [
             [
-                'id_user'    => 1,
+                'id_user'    => 1, // Usuário Admin
                 'status'     => 'not_seen',
                 'event_date' => date('Y-m-d H:i:s', strtotime('-1 hour')),
                 'type'       => 'mention_in_post',
                 'id_origin'  => 1, // post id
             ],
             [
-                'id_user'    => 2,
+                'id_user'    => 2, // Usuário JohnDoe
                 'status'     => 'seen',
                 'event_date' => date('Y-m-d H:i:s', strtotime('-2 hours')),
                 'type'       => 'friend_request',
-                'id_origin'  => 1, // user id
+                'id_origin'  => 1, // user id (do Admin)
             ],
             [
-                'id_user'    => 3,
+                'id_user'    => 1, // CORRIGIDO: Era 3, agora é para o Admin
                 'status'     => 'not_seen',
                 'event_date' => date('Y-m-d H:i:s', strtotime('-30 minutes')),
                 'type'       => 'message',
-                'id_origin'  => 2, // user id
+                'id_origin'  => 2, // user id (do JohnDoe)
             ],
             [
-                'id_user'    => 1,
+                'id_user'    => 1, // Usuário Admin
                 'status'     => 'seen',
                 'event_date' => date('Y-m-d H:i:s', strtotime('-3 days')),
                 'type'       => 'invite',
                 'id_origin'  => 1, // community id
             ],
             [
-                'id_user'    => 2,
+                'id_user'    => 2, // Usuário JohnDoe
                 'status'     => 'not_seen',
                 'event_date' => date('Y-m-d H:i:s', strtotime('-6 hours')),
                 'type'       => 'mention_in_comment',

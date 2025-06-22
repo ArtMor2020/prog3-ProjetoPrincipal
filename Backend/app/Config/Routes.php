@@ -33,6 +33,7 @@ $routes->group('users', function (RouteCollection $routes) {
 
 // --------------- COMMUNITIES ---------------
 $routes->group('communities', function (RouteCollection $routes) {
+    $routes->get('user-status/(:num)/(:num)', 'CommunityController::userStatus/$1/$2');
     $routes->get('',                   'CommunityController::index');
     $routes->get('(:segment)',         'CommunityController::show/$1');
     $routes->get('owner/(:num)',       'CommunityController::byOwner/$1');
@@ -86,6 +87,8 @@ $routes->group('direct-messages', function ($routes) {
     $routes->get('conversation/(:num)/(:num)',  'DirectMessageController::conversation/$1/$2');
     $routes->put('(:num)/seen',                 'DirectMessageController::markSeen/$1');
     $routes->get('messages/unseen/(:num)',      'DirectMessageController::getUnseen/$1');
+    $routes->get('unread-summary/(:num)', 'DirectMessageController::unreadSummary/$1');
+    $routes->put('mark-conversation-seen/(:num)/(:num)', 'DirectMessageController::markConversationSeen/$1/$2');
 });
 
 // ------- USER–COMMUNITIES -------
@@ -144,6 +147,7 @@ $routes->group('attachments', function ($routes) {
     $routes->put('(:num)',         'AttachmentController::update/$1');
     $routes->delete('(:num)',      'AttachmentController::delete/$1');
     $routes->put('(:num)/restore', 'AttachmentController::restore/$1');
+    $routes->get('serve/(:num)', 'AttachmentController::serve/$1');
 });
 
 // --- ATTACHMENT IN POSTS ---
@@ -172,11 +176,13 @@ $routes->group('ratings-in-comments', function ($routes) {
 
 // -------- SEARCH --------
 $routes->group('search', function($routes) {
-    $routes->get('(:segment)', 'SearchController::query/$1');
+    $routes->get('', 'SearchController::query');
+    $routes->get('users', 'SearchController::users');
 });
 
 // ------- FRIENDSHIP --------
 $routes->group('friendship', function($routes) {
+    $routes->get('status/(:num)/(:num)', 'FriendshipController::getStatus/$1/$2');
     $routes->post('send-request',     'FriendshipController::sendRequest');
     $routes->get('requests/(:num)',   'FriendshipController::getRequests/$1');
     $routes->put('accept/(:num)',     'FriendshipController::acceptRequest/$1');

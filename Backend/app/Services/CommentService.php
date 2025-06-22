@@ -2,9 +2,6 @@
 
 namespace App\Services;
 
-use App\Database\Migrations\Attachment;
-use App\Database\Migrations\AttachmentInComment;
-use App\Entities\CommentEntity;
 use App\Repositories\CommentRepository;
 use App\Repositories\AttachmentInCommentRepository;
 use App\Repositories\NotificationRepository;
@@ -18,8 +15,9 @@ class CommentService
     protected AttachmentInCommentRepository $attachmentInCommentRepository;
     protected UserRepository $userRepository;
     protected NotificationRepository $notificationRepository;
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->commentRepository = new CommentRepository();
         $this->attachmentService = new AttachmentService();
         $this->attachmentInCommentRepository = new AttachmentInCommentRepository();
@@ -27,38 +25,43 @@ class CommentService
         $this->notificationRepository = new NotificationRepository();
     }
 
-    function submitComment(array $comment, ?UploadedFile ...$files){
-        if(empty($comment)) return false;
+    function submitComment(array $comment, ?UploadedFile ...$files)
+    {
+        if (empty($comment))
+            return false;
 
         $attachmentIds = [];
 
-        foreach($files as $file) {
-            $attachmentIds[] = $this->attachmentService->uploadFile($file);
+        foreach ($files as $file) {
+            if ($file && $file->isValid()) {
+                $attachmentIds[] = $this->attachmentService->uploadFile($file);
+            }
         }
 
         $commentId = $this->commentRepository->create($comment);
 
-        foreach($attachmentIds as $attachmentId){
-            $this->attachmentInCommentRepository->create($commentId, $attachmentId);
+        foreach ($attachmentIds as $attachmentId) {
+            if ($attachmentId) {
+                $this->attachmentInCommentRepository->create($commentId, $attachmentId);
+            }
         }
 
-        // makes notification for mentions
-        $namesMentioned = array_unique(array_merge(
-            $this->getMentions($comment['content'])
-        ));
+        $namesMentioned = array_unique($this->getMentions($comment['content']));
 
-        foreach ($namesMentioned as $name) 
-        {
+        foreach ($namesMentioned as $name) {
             $user = $this->userRepository->getUserByName($name);
 
-            if ($user && 
+            if (
+                $user &&
                 !$this->notificationRepository->existsUnreadNotification(
-                    $user['id'], $commentId, 'mention_in_comment')
+                    $user->getId(),
+                    $commentId,
+                    'mention_in_comment'
                 )
-            {
+            ) {
                 $this->notificationRepository->notifyUser(
-                    $user['id'], 
-                    'mention_in_comment', 
+                    $user->getId(),
+                    'mention_in_comment',
                     $commentId
                 );
             }

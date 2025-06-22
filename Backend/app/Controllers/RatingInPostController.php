@@ -15,9 +15,6 @@ class RatingInPostController extends ResourceController
         $this->repository = new RatingInPostRepository();
     }
 
-    /**
-     * POST /ratings-in-posts/{postId}/votes
-     */
     public function toggle($postId)
     {
         $payload  = $this->request->getJSON(true);
@@ -37,19 +34,12 @@ class RatingInPostController extends ResourceController
         return $this->respond(['status' => 'ok']);
     }
 
-    /**
-     * GET /ratings-in-posts/{postId}/votes
-     * Lista todos os votos (para saber se o usuário já votou)
-     */
     public function list($postId)
     {
         $votes = $this->repository->getVotesForPost((int) $postId);
         return $this->respond($votes);
     }
 
-    /**
-     * GET /ratings-in-posts/{postId}/score
-     */
     public function score($postId = null)
     {
         if (empty($postId) || !is_numeric($postId)) {
@@ -64,10 +54,6 @@ class RatingInPostController extends ResourceController
         ]);
     }
 
-    /**
-     * DELETE /ratings-in-posts/{postId}/vote/delete
-     * Body JSON: { "id_user": 123 }
-     */
     public function remove($postId)
     {
         $data = $this->request->getJSON(true);

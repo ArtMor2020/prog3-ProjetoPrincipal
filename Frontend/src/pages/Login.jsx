@@ -1,41 +1,34 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
-import axios from 'axios';
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
+import axios from "axios";
 
 export default function LoginPage() {
   const { login } = useUser();
   const history = useHistory();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
-      const res = await axios.post('http://localhost:8080/users/auth', {
+      const res = await axios.post("http://localhost:8080/users/auth", {
         email,
         password,
       });
 
-      // supondo que o backend retorne { user, token } em status 200
       const { user, token } = res.data;
-      login(user, token); 
-      // opcional: salvar token/localStorage
-      // localStorage.setItem('token', token);
+      login(user, token);
 
-      // redireciona somente se deu certo
-      history.push('/home');
+      history.push("/home");
     } catch (err) {
-      // Axios coloca o erro da resposta em err.response
       if (err.response) {
-        // Mensagem que seu backend enviar, ex: { message: "Credenciais inválidas" }
-        setError(err.response.data.message || 'Falha no login');
+        setError(err.response.data.message || "Falha no login");
       } else {
-        // erro de rede ou outro
-        setError('Erro de conexão. Tente novamente.');
+        setError("Erro de conexão. Tente novamente.");
       }
     }
   };
@@ -51,7 +44,7 @@ export default function LoginPage() {
             type="email"
             className="w-full p-2 border rounded"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -61,7 +54,7 @@ export default function LoginPage() {
             type="password"
             className="w-full p-2 border rounded"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>

@@ -4,14 +4,18 @@ namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\AttachmentRepository;
+use App\Services\AttachmentService;
 
 class AttachmentController extends ResourceController
 {
     protected $repo;
+    protected AttachmentService $service;
 
     public function __construct()
     {
         $this->repo = new AttachmentRepository();
+        $this->service = new AttachmentService();
+
     }
 
     public function index()
@@ -68,5 +72,20 @@ class AttachmentController extends ResourceController
         return $ok
             ? $this->respond(['status' => 'restored'])
             : $this->failNotFound('Não foi possível restaurar');
+    }
+
+    public function serve($id = null)
+    {
+        try {
+            $fileData = $this->service->getFile((int) $id);
+
+            $this->response->setContentType($fileData['type']);
+            $this->response->setHeader('Content-Disposition', 'inline; filename="' . $fileData['name'] . '"');
+
+            return $this->response->setBody($fileData['content']);
+
+        } catch (\RuntimeException $e) {
+            return $this->failNotFound($e->getMessage());
+        }
     }
 }

@@ -8,7 +8,9 @@ use App\Entities\RatingInCommentEntity;
 class RatingInCommentModel extends Model
 {
     protected $table = 'rating_in_comment';
+
     protected $primaryKey = ['id_comment', 'id_user'];
+
     protected $useAutoIncrement = false;
     protected $returnType = RatingInCommentEntity::class;
 

@@ -21,7 +21,7 @@ class DirectMessageRepository
 
     public function getMessage(int $id): DirectMessageEntity|null
     {
-        return $this->model->find( $id);
+        return $this->model->find($id);
     }
 
     public function getConversation(int $userA, int $userB): array
@@ -37,9 +37,30 @@ class DirectMessageRepository
         return $this->model->update($id, ['is_seen' => true]);
     }
 
-    public function getUnseenMessagesForUser(int $userId){
+    public function getUnseenMessagesForUser(int $userId)
+    {
         return $this->model->where('id_reciever', $userId)
-                            ->where('is_seen', false)
-                            ->findAll();
+            ->where('is_seen', false)
+            ->findAll();
+    }
+
+    public function getUnreadSummary(int $userId): array
+    {
+        return $this->model
+            ->select('id_sender, COUNT(id) as unread_count')
+            ->where('id_reciever', $userId)
+            ->where('is_seen', false)
+            ->groupBy('id_sender')
+            ->findAll();
+    }
+
+    public function markConversationAsSeen(int $readerId, int $senderId): bool
+    {
+        return $this->model
+            ->where('id_reciever', $readerId)
+            ->where('id_sender', $senderId)
+            ->where('is_seen', false)
+            ->set('is_seen', true)
+            ->update();
     }
 }

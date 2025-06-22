@@ -10,73 +10,61 @@ class PostController extends ResourceController
 {
     protected $format = 'json';
     protected PostRepository $repository;
-    protected PostService    $postService;
+    protected PostService $postService;
 
     public function __construct()
     {
-        $this->repository  = new PostRepository();
+        $this->repository = new PostRepository();
         $this->postService = new PostService();
     }
 
-    /**
-     * GET /posts
-     * GET /posts/community/{communityId}
-     */
     public function index($communityId = null)
     {
+        $viewerId = $this->request->getGet('viewerId');
+
         $posts = $communityId
-            ? $this->repository->findAllByCommunity((int) $communityId)
-            : $this->repository->findAll();
+            ? $this->repository->findAllByCommunity((int) $communityId, (int) $viewerId)
+            : $this->repository->findAll((int) $viewerId);
 
         return $this->respond($posts);
     }
 
-    /**
-     * GET /posts/{id}
-     */
     public function show($id = null)
     {
-        $post = $this->repository->findById((int) $id);
+        [$post, $attachments] = $this->postService->getPost((int) $id);
 
-        return $post
-            ? $this->respond($post)
-            : $this->failNotFound('Post not found');
+        if (!$post) {
+            return $this->failNotFound('Post não encontrado ou falha ao processar dados.');
+        }
+
+        return $this->respond([$post, $attachments]);
     }
 
-    /**
-     * GET /posts/title/{title}
-     */
     public function getByTitle($title)
     {
         $posts = $this->repository->getPostsByTitle($title);
         return $this->respond($posts);
     }
 
-    /**
-     * GET /posts/popular?page={n}&posts-per-page={m}
-     */
     public function getPopular()
     {
-        $page         = $this->request->getGet('page') ?: null;
-        $perPage      = $this->request->getGet('posts-per-page') ?: null;
-        $posts        = $this->repository->getPopularPosts($page, $perPage);
+        $page = $this->request->getGet('page') ?: null;
+        $perPage = $this->request->getGet('posts-per-page') ?: null;
+        $posts = $this->repository->getPopularPosts($page, $perPage);
         return $this->respond($posts);
     }
 
-    /**
-     * GET /posts/community/{id}/popular?period={day|week|month|year}&page={n}&posts-per-page={m}
-     */
     public function getPopularInCommunity($communityId)
     {
-        $valid      = ['day','week','month','year'];
-        $period     = $this->request->getGet('period');
-        $period     = in_array($period, $valid) ? $period : null;
-        $page       = $this->request->getGet('page') ?: null;
-        $perPage    = $this->request->getGet('posts-per-page') ?: null;
+        $valid = ['day', 'week', 'month', 'year'];
+        $period = $this->request->getGet('period');
+        $period = in_array($period, $valid) ? $period : null;
+        $page = $this->request->getGet('page') ?: null;
+        $perPage = $this->request->getGet('posts-per-page') ?: null;
 
         $posts = $this->repository
             ->getPostsFromCommunityByPopularityInPeriod(
-                (int)$communityId,
+                (int) $communityId,
                 $period,
                 $page,
                 $perPage
@@ -85,15 +73,12 @@ class PostController extends ResourceController
         return $this->respond($posts);
     }
 
-    /**
-     * GET /posts/recommended/{userId}?page={n}&posts-per-page={m}
-     */
     public function getRecommended($userId)
     {
-        $page      = $this->request->getGet('page') ?: null;
-        $perPage   = $this->request->getGet('posts-per-page') ?: null;
-        $posts     = $this->repository->getRecommendedPostsForUser(
-            (int)$userId,
+        $page = $this->request->getGet('page') ?: null;
+        $perPage = $this->request->getGet('posts-per-page') ?: null;
+        $posts = $this->repository->getRecommendedPostsForUser(
+            (int) $userId,
             $page,
             $perPage
         );
@@ -101,26 +86,16 @@ class PostController extends ResourceController
         return $this->respond($posts);
     }
 
-    /**
-     * POST /posts/submit
-     * Recebe form-data com campos do post + attachments[]
-     */
     public function submit()
     {
-        $post   = $this->request->getPost();
-        $files  = $this->request->getFiles();
+        $post = $this->request->getPost();
+        $files = $this->request->getFiles();
         $uploaded = [];
 
-        if (! empty($files['attachments']))
-        {
-            $batch = is_array($files['attachments'])
-                ? $files['attachments']
-                : [$files['attachments']];
-
-            foreach ($batch as $file)
-            {
-                if ($file->isValid() && ! $file->hasMoved())
-                {
+        if (!empty($files['attachments'])) {
+            $batch = $files['attachments'];
+            foreach ($batch as $file) {
+                if ($file && $file->isValid() && !$file->hasMoved()) {
                     $uploaded[] = $file;
                 }
             }
@@ -128,37 +103,29 @@ class PostController extends ResourceController
 
         $postId = $this->postService->submitPost($post, ...$uploaded);
 
-        if (! $postId) {
-            return $this->failValidationError('Invalid post data.');
+        if (!$postId) {
+            return $this->failValidationError('Dados de post inválidos ou falha ao processar.');
         }
 
         return $this->respondCreated(['id' => $postId]);
     }
 
-    /**
-     * POST /posts
-     * (criação simples sem attachments)
-     */
     public function create()
     {
         $data = $this->request->getJSON(true);
 
-        if (
-            empty($data['id_user']) ||
-            empty($data['id_community']) ||
-            empty($data['title']) ||
-            empty($data['description'])
-        ) {
+        // Validação agora só exige id_user e title
+        if (empty($data['id_user']) || empty($data['title'])) {
             return $this->failValidationError(
-                'Campos id_user, id_community, title e description são obrigatórios.'
+                'Campos id_user e title são obrigatórios.'
             );
         }
 
         $id = $this->repository->createPost([
-            'id_user'      => (int)$data['id_user'],
-            'id_community' => (int)$data['id_community'],
-            'title'        => $data['title'],
-            'description'  => $data['description'],
+            'id_user' => (int) $data['id_user'],
+            'id_community' => isset($data['id_community']) && !empty($data['id_community']) ? (int) $data['id_community'] : null,
+            'title' => $data['title'],
+            'description' => $data['description'] ?? '',
         ]);
 
         if ($id === false) {
@@ -168,40 +135,23 @@ class PostController extends ResourceController
         return $this->respondCreated(['id' => $id]);
     }
 
-    /**
-     * PUT /posts/{id}
-     */
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
-
         if (empty($data['title']) && empty($data['description'])) {
-            return $this->failValidationError(
-                'É preciso ao menos title ou description para atualizar.'
-            );
+            return $this->failValidationError('É preciso ao menos title ou description para atualizar.');
         }
-
-        $success = $this->repository->update((int)$id, $data);
-
-        return $success
-            ? $this->respond(['status' => 'updated'])
-            : $this->fail('Update failed', 400);
+        $success = $this->repository->update((int) $id, $data);
+        return $success ? $this->respond(['status' => 'updated']) : $this->fail('Update failed', 400);
     }
 
-    /**
-     * DELETE /posts/{id}
-     */
     public function delete($id = null)
     {
-        $success = $this->repository->deletePost((int)$id);
-
-        if (! $success) {
-            $exists = (bool)$this->repository->findById((int)$id);
-            return $exists
-                ? $this->fail('Post already deleted or cannot be deleted', 400)
-                : $this->failNotFound('Post not found');
+        $success = $this->repository->deletePost((int) $id);
+        if (!$success) {
+            $exists = (bool) $this->repository->findById((int) $id);
+            return $exists ? $this->fail('Post já deletado ou não pode ser deletado', 400) : $this->failNotFound('Post não encontrado');
         }
-
         return $this->respondDeleted(['status' => 'deleted']);
     }
 }
