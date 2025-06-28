@@ -3,6 +3,7 @@ import axios from "axios";
 import { X, Send } from "lucide-react";
 import { useUser } from "../contexts/UserContext";
 import timeAgo from "../utils/timeAgo";
+import apiClient from '../api/axiosConfig';
 
 export default function ChatWindow({ chatUser, onClose }) {
   const { user } = useUser();
@@ -17,7 +18,7 @@ export default function ChatWindow({ chatUser, onClose }) {
 
   const fetchMessages = async () => {
     try {
-      const { data } = await axios.get(
+      const { data } = await apiClient.get(
         `http://localhost:8080/direct-messages/conversation/${user.id}/${chatUser.id}`
       );
       setMessages(data);
@@ -29,7 +30,7 @@ export default function ChatWindow({ chatUser, onClose }) {
   useEffect(() => {
     const markAsRead = async () => {
       try {
-        await axios.put(
+        await apiClient.put(
           `http://localhost:8080/direct-messages/mark-conversation-seen/${user.id}/${chatUser.id}`
         );
       } catch (error) {
@@ -70,7 +71,7 @@ export default function ChatWindow({ chatUser, onClose }) {
       setMessages((prev) => [...prev, tempMessage]);
       setNewMessage("");
 
-      await axios.post("http://localhost:8080/direct-messages", payload);
+      await apiClient.post("http://localhost:8080/direct-messages", payload);
       fetchMessages();
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error);

@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import FriendshipButton from "../components/FriendshipButton";
 import BlockUserButton from "../components/BlockUserButton";
 import { useUser } from "../contexts/UserContext";
+import apiClient from '../api/axiosConfig';
 
 export default function UserPage() {
   const { userId } = useParams();
@@ -19,12 +20,12 @@ export default function UserPage() {
       if (!loggedInUser) return;
       setLoading(true);
       try {
-        const userRes = await axios.get(
+        const userRes = await apiClient.get(
           `http://localhost:8080/users/${userId}`
         );
         setProfileUser(userRes.data);
 
-        const postsRes = await axios.get(
+        const postsRes = await apiClient.get(
           `http://localhost:8080/posts?viewerId=${loggedInUser.id}`
         );
         const userPosts = postsRes.data.filter(
@@ -35,12 +36,12 @@ export default function UserPage() {
           userPosts.map(async (post) => {
             let communityName = userRes.data.name;
             if (post.id_community) {
-              const commRes = await axios.get(
+              const commRes = await apiClient.get(
                 `http://localhost:8080/communities/${post.id_community}`
               );
               communityName = commRes.data.name;
             }
-            const commentsRes = await axios.get(
+            const commentsRes = await apiClient.get(
               `http://localhost:8080/comments/post/${post.id}?viewerId=${loggedInUser.id}`
             );
             return {

@@ -5,17 +5,20 @@ namespace App\Controllers;
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\PostRepository;
 use App\Services\PostService;
+use App\Services\NotificationService;
 
 class PostController extends ResourceController
 {
     protected $format = 'json';
     protected PostRepository $repository;
     protected PostService $postService;
+    protected NotificationService $notificationService;
 
     public function __construct()
     {
         $this->repository = new PostRepository();
         $this->postService = new PostService();
+        $this->notificationService = new NotificationService();
     }
 
     public function index($communityId = null)
@@ -23,8 +26,8 @@ class PostController extends ResourceController
         $viewerId = $this->request->getGet('viewerId');
 
         $posts = $communityId
-            ? $this->repository->findAllByCommunity((int) $communityId, (int) $viewerId)
-            : $this->repository->findAll((int) $viewerId);
+            ? $this->repository->findAllByCommunity((int) $communityId, $viewerId ? (int) $viewerId : null)
+            : $this->repository->findAllSortedByScore($viewerId ? (int) $viewerId : null);
 
         return $this->respond($posts);
     }
@@ -153,5 +156,24 @@ class PostController extends ResourceController
             return $exists ? $this->fail('Post já deletado ou não pode ser deletado', 400) : $this->failNotFound('Post não encontrado');
         }
         return $this->respondDeleted(['status' => 'deleted']);
+    }
+
+    public function report($postId = null)
+    {
+        if (!is_numeric($postId)) {
+            return $this->failValidationError('ID de post inválido.');
+        }
+
+        $post = $this->repository->findById((int)$postId);
+        if (!$post) {
+            return $this->failNotFound('Post não encontrado.');
+        }
+
+        $notificationService = new NotificationService();
+        $success = $notificationService->notifyAboutReportedPost($post);
+
+        return $success
+            ? $this->respond(['status' => 'reported'])
+            : $this->fail('Não foi possível registrar o report.');
     }
 }

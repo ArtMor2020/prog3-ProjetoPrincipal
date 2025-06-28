@@ -32,9 +32,8 @@ class Notification extends Migration
                 'constraint' => 50,
             ],
             'id_origin' => [
-                'type' => 'INT',
+                'type' => 'VARCHAR',
                 'constraint' => 11,
-                'unsigned' => true,
             ],
         ]);
 

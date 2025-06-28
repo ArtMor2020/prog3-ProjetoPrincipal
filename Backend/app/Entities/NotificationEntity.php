@@ -9,10 +9,10 @@ class NotificationEntity extends Entity
     protected $attributes = [
         'id' => null,
         'id_user' => null,
-        'status' => null, // 'seen' or 'not_seen'
+        'status' => null, 
         'event_date' => null,
-        'type' => null, // mention, message, pending_post, friend_request
-        'id_origin' => null, // id of post, comment, person messaging, community with pending post, etc
+        'type' => null, 
+        'id_origin' => null, 
     ];
 
     public function getId()
@@ -69,8 +69,7 @@ class NotificationEntity extends Entity
     {
         return $this->attributes['id_origin'];
     }
-    public function setIdOrigin(int $id_origin)
-    {
+    public function setIdOrigin($id_origin) {
         $this->attributes['id_origin'] = $id_origin;
         return $this;
     }

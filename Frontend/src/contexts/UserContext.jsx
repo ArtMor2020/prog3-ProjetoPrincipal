@@ -1,12 +1,16 @@
-import React, { createContext, useState, useContext, useCallback } from "react";
+import React, { createContext, useState, useContext, useCallback } from 'react';
 
 const UserContext = createContext(null);
 export const useUser = () => useContext(UserContext);
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
   });
 
   const [openChatWindows, setOpenChatWindows] = useState([]);

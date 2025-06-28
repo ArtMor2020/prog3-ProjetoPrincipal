@@ -4,6 +4,7 @@ import axios from "axios";
 import Header from "../components/Header";
 import PostCard from "../components/PostCard";
 import { useUser } from "../contexts/UserContext";
+import apiClient from '../api/axiosConfig';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -22,17 +23,17 @@ export default function SearchResultsPage() {
   useEffect(() => {
     if (!query) return;
     setLoading(true);
-    axios
+    apiClient
       .get(`http://localhost:8080/search/${query}`)
       .then(async (res) => {
         const enrichedPosts = await Promise.all(
           res.data.posts.map(async (post) => {
-            const userRes = await axios.get(
+            const userRes = await apiClient.get(
               `http://localhost:8080/users/${post.id_user}`
             );
             let commName = userRes.data.name;
             if (post.id_community) {
-              const commRes = await axios.get(
+              const commRes = await apiClient.get(
                 `http://localhost:8080/communities/${post.id_community}`
               );
               commName = commRes.data.name;

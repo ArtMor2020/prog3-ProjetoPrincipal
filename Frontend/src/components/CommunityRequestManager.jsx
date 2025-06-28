@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useUser } from "../contexts/UserContext";
+import apiClient from '../api/axiosConfig';
 
 const RequestItem = ({ request, onAction }) => {
   const [communityName, setCommunityName] = useState("...");
 
   useEffect(() => {
-    axios
+    apiClient
       .get(`http://localhost:8080/communities/${request.id_community}`)
       .then((res) => setCommunityName(res.data.name))
       .catch(console.error);
@@ -15,7 +16,7 @@ const RequestItem = ({ request, onAction }) => {
   const handleAction = async (action) => {
     const url = `http://localhost:8080/community-join-requests/${request.id}/${action}`;
     try {
-      await axios.put(url);
+      await apiClient.put(url);
       onAction();
     } catch (error) {
       console.error(`Erro ao ${action} o pedido:`, error);
@@ -53,14 +54,14 @@ export default function CommunityRequestManager({ profileUserId }) {
   const fetchRequests = useCallback(async () => {
     if (!user) return;
     try {
-      const { data: pendingRequests } = await axios.get(
+      const { data: pendingRequests } = await apiClient.get(
         `http://localhost:8080/community-join-requests/user/${profileUserId}`
       );
       const filteredPending = pendingRequests.filter(
         (r) => r.status === "pending"
       );
 
-      const { data: userAdminOf } = await axios.get(
+      const { data: userAdminOf } = await apiClient.get(
         `http://localhost:8080/user-communities/user/${user.id}`
       );
       const adminOfCommunityIds = userAdminOf

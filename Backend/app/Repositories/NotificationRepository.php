@@ -22,32 +22,39 @@ class NotificationRepository
     public function findNotificationsForUser(int $userId)
     {
         return $this->notificationModel->where('id_user', $userId)
-            ->where('status', 'not_seen')
-            ->orderBy('event_date', 'DESC')
-            ->findAll();
+                                        ->where('status', 'not_seen')
+                                        ->orderBy('event_date', 'DESC')
+                                        ->findAll();
     }
 
-    public function notifyUser(int $userId, string $type, int $originId): bool|int
+    public function notifyUser(int $userId, string $type, $originId): bool|int
     {
         $notification = new NotificationEntity();
+        $notification->id_user = $userId;
+        $notification->status = 'not_seen';
+        $notification->event_date = date('Y-m-d H:i:s');
+        $notification->type = $type;
+        $notification->id_origin = $originId;
 
-        $notification->setIdUser($userId);
-        $notification->setStatus('not_seen');
-        $notification->setEventDate(date('Y-m-d H:i:s'));
-        $notification->setType($type);
-        $notification->setIdOrigin($originId);
-
-        return $this->notificationModel->insert($notification, true);
+        try {
+            if ($this->notificationModel->save($notification)) {
+                return $this->notificationModel->getInsertID();
+            }
+            return false;
+        } catch (Throwable $e) {
+            log_message('error', '[NotificationRepository::notifyUser] Exceção ao salvar: ' . $e->getMessage());
+            return false;
+        }
     }
 
-    public function existsUnreadNotification(int $userId, int $originId, string $type): bool
+    public function existsUnreadNotification(int $userId, $originId, string $type): bool
     {
         return $this->notificationModel->where([
-            'id_user' => $userId,
-            'id_origin' => $originId,
-            'type' => $type,
-            'status' => 'not_seen'
-        ])
+                'id_user'   => $userId,
+                'id_origin' => $originId,
+                'type'      => $type,
+                'status'    => 'not_seen'
+            ])
             ->countAllResults() > 0;
     }
 

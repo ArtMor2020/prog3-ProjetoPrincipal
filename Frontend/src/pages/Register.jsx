@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import apiClient from '../api/axiosConfig';
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -21,7 +22,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8080/users", form);
+      const res = await apiClient.post("http://localhost:8080/users", form);
       console.log("Usuário criado com ID", res.data.id);
       history.push("/login");
     } catch (err) {

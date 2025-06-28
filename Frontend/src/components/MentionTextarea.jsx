@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import apiClient from '../api/axiosConfig';
 
 export default function MentionTextarea({
   value = "",
@@ -23,7 +24,7 @@ export default function MentionTextarea({
       setShowSuggestions(true);
 
       const handler = setTimeout(() => {
-        axios
+        apiClient
           .get(`http://localhost:8080/search/users`, {
             params: { term: query },
           })
