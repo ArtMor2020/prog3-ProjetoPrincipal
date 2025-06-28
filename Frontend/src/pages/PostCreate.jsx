@@ -5,6 +5,7 @@ import { useUser } from "../contexts/UserContext";
 import Header from "../components/Header";
 import MentionTextarea from "../components/MentionTextarea";
 import { FileText, Archive, X } from "lucide-react";
+import apiClient from '../api/axiosConfig';
 
 const FilePreview = ({ file, onRemove }) => {
   const fileType = file.type.split("/")[0];
@@ -73,14 +74,14 @@ export default function PostCreate() {
 
   useEffect(() => {
     if (!user) return;
-    axios
+    apiClient
       .get(`http://localhost:8080/user-communities/user/${user.id}`)
       .then((res) => {
         const memberOfCommunityIds = res.data.map((uc) =>
           String(uc.id_community)
         );
         if (memberOfCommunityIds.length > 0) {
-          axios.get("http://localhost:8080/communities").then((allRes) => {
+          apiClient.get("http://localhost:8080/communities").then((allRes) => {
             const memberCommunities = allRes.data.filter((c) =>
               memberOfCommunityIds.includes(String(c.id))
             );
@@ -127,7 +128,7 @@ export default function PostCreate() {
     });
 
     try {
-      const res = await axios.post(
+      const res = await apiClient.post(
         "http://localhost:8080/posts/submit",
         formData,
         {

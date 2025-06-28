@@ -23,12 +23,10 @@ class AttachmentController extends ResourceController
         return $this->respond($this->repo->findAll());
     }
 
-    public function show($id = null)
+public function show($id = null)
     {
         $att = $this->repo->findById((int) $id);
-        return $att
-            ? $this->respond($att)
-            : $this->failNotFound('Attachment não encontrado');
+        return $att ? $this->respond($att) : $this->failNotFound('Attachment não encontrado');
     }
 
     public function create()
@@ -77,15 +75,39 @@ class AttachmentController extends ResourceController
     public function serve($id = null)
     {
         try {
-            $fileData = $this->service->getFile((int) $id);
+            if (!is_numeric($id)) {
+                return $this->failValidationError('ID de anexo inválido.');
+            }
 
-            $this->response->setContentType($fileData['type']);
-            $this->response->setHeader('Content-Disposition', 'inline; filename="' . $fileData['name'] . '"');
+            $attachment = $this->repo->findById((int)$id);
 
-            return $this->response->setBody($fileData['content']);
+            if (!$attachment || $attachment->getIsDeleted()) {
+                return $this->failNotFound('Anexo não encontrado ou foi deletado.');
+            }
 
-        } catch (\RuntimeException $e) {
-            return $this->failNotFound($e->getMessage());
+            $filePath = $attachment->getPath();
+
+            if (!file_exists($filePath)) {
+                log_message('error', "[AttachmentController] Arquivo não encontrado no disco: {$filePath}");
+                return $this->failNotFound('Arquivo não existe no servidor.');
+            }
+
+            $fileContent = file_get_contents($filePath);
+            if ($fileContent === false) {
+                throw new \RuntimeException('Não foi possível ler o arquivo.');
+            }
+
+            $mimeType = mime_content_type($filePath);
+
+            $this->response->setContentType($mimeType);
+
+            $this->response->setBody($fileContent);
+
+            return $this->response;
+
+        } catch (Throwable $e) {
+            log_message('error', "[AttachmentController::serve] Exceção: " . $e->getMessage());
+            return $this->failServerError('Ocorreu um erro ao tentar servir o anexo.');
         }
     }
 }

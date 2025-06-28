@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useUser } from "../contexts/UserContext";
 import { LogIn, Check, Clock } from "lucide-react";
+import apiClient from '../api/axiosConfig';
 
 export default function CommunityJoinButton({ communityId }) {
   const { user } = useUser();
@@ -13,7 +14,7 @@ export default function CommunityJoinButton({ communityId }) {
       return;
     }
     try {
-      const { data } = await axios.get(
+      const { data } = await apiClient.get(
         `http://localhost:8080/communities/user-status/${communityId}/${user.id}`
       );
       setStatus(data.status);
@@ -30,7 +31,7 @@ export default function CommunityJoinButton({ communityId }) {
   const handleJoinRequest = async () => {
     setStatus("loading");
     try {
-      await axios.post("http://localhost:8080/community-join-requests", {
+      await apiClient.post("http://localhost:8080/community-join-requests", {
         community_id: communityId,
         user_id: user.id,
       });

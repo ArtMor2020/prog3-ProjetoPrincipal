@@ -32,7 +32,7 @@ $routes->group('users', function (RouteCollection $routes) {
 });
 
 // --------------- COMMUNITIES ---------------
-$routes->group('communities', function (RouteCollection $routes) {
+$routes->group('communities', ['filter' => 'auth'], function (RouteCollection $routes) {
     $routes->get('user-status/(:num)/(:num)', 'CommunityController::userStatus/$1/$2');
     $routes->get('',                   'CommunityController::index');
     $routes->get('(:segment)',         'CommunityController::show/$1');
@@ -47,7 +47,7 @@ $routes->group('communities', function (RouteCollection $routes) {
 });
 
 // ----------------- POSTS -----------------
-$routes->group('posts', function (RouteCollection $routes) {
+$routes->group('posts', ['filter' => 'auth'], function (RouteCollection $routes) {
     $routes->get('',                           'PostController::index');
     $routes->get('community/(:segment)',       'PostController::index/$1');
     $routes->get('popular',                    'PostController::getPopular');
@@ -57,12 +57,13 @@ $routes->group('posts', function (RouteCollection $routes) {
     $routes->get('(:segment)',                 'PostController::show/$1');
     $routes->post('',                          'PostController::create');
     $routes->post('submit',                    'PostController::submit');
+    $routes->post('(:num)/report', 'PostController::report/$1');
     $routes->put('(:segment)',                 'PostController::update/$1');
     $routes->delete('(:segment)',              'PostController::delete/$1');
 });
 
 // ----------------- COMMENTS -----------------
-$routes->group('comments', function (RouteCollection $routes) {
+$routes->group('comments', ['filter' => 'auth'], function (RouteCollection $routes) {
     $routes->get('',                    'CommentController::index');
     $routes->get('post/(:num)',         'CommentController::index/$1');
     $routes->get('comment/(:num)',      'CommentController::byParent/$1');
@@ -72,17 +73,18 @@ $routes->group('comments', function (RouteCollection $routes) {
     $routes->post('(:num)/reply',       'CommentController::reply/$1');
     $routes->put('(:num)',              'CommentController::update/$1');
     $routes->delete('(:num)',           'CommentController::delete/$1');
+    $routes->post('(:num)/report', 'CommentController::report/$1');
 });
 
 // ------------- BLOCKED USERS -------------
-$routes->group('blocked-users', function ($routes) {
+$routes->group('blocked-users', ['filter' => 'auth'], function ($routes) {
     $routes->post('block',    'BlockedUserController::block');
     $routes->put('unblock',   'BlockedUserController::unblock');
     $routes->get('(:num)',    'BlockedUserController::index/$1');
 });
 
 // --------- DIRECT MESSAGES ---------
-$routes->group('direct-messages', function ($routes) {
+$routes->group('direct-messages', ['filter' => 'auth'], function ($routes) {
     $routes->post('',                           'DirectMessageController::create');
     $routes->get('conversation/(:num)/(:num)',  'DirectMessageController::conversation/$1/$2');
     $routes->put('(:num)/seen',                 'DirectMessageController::markSeen/$1');
@@ -92,7 +94,7 @@ $routes->group('direct-messages', function ($routes) {
 });
 
 // ------- USER–COMMUNITIES -------
-$routes->group('user-communities', function ($routes) {
+$routes->group('user-communities', ['filter' => 'auth'], function ($routes) {
     $routes->post('',                       'UserInCommunityController::create');
     $routes->post('add',                    'UserInCommunityController::add');
     $routes->put('role',                    'UserInCommunityController::setRole');
@@ -106,7 +108,7 @@ $routes->group('user-communities', function ($routes) {
 });
 
 // -------- COMMUNITY VIEWS --------
-$routes->group('community-views', function ($routes) {
+$routes->group('community-views', ['filter' => 'auth'], function ($routes) {
     $routes->post('',                       'CommunityViewController::create');
     $routes->post('log/(:num)/(:num)',      'CommunityViewController::log/$1/$2');
     $routes->get('(:num)',                  'CommunityViewController::index/$1');
@@ -115,7 +117,7 @@ $routes->group('community-views', function ($routes) {
 });
 
 // ---- COMMUNITY JOIN REQUESTS ----
-$routes->group('community-join-requests', function ($routes) {
+$routes->group('community-join-requests', ['filter' => 'auth'], function ($routes) {
     $routes->get('',                    'CommunityJoinRequestController::index');
     $routes->get('community/(:num)',    'CommunityJoinRequestController::byCommunity/$1');
     $routes->get('user/(:num)',         'CommunityJoinRequestController::byUser/$1');
@@ -125,7 +127,7 @@ $routes->group('community-join-requests', function ($routes) {
 });
 
 // ------- RATINGS IN POSTS -------
-$routes->group('ratings-in-posts', function ($routes) {
+$routes->group('ratings-in-posts', ['filter' => 'auth'], function ($routes) {
     $routes->post('(:num)/votes',    'RatingInPostController::toggle/$1');
     $routes->get('(:num)/votes',     'RatingInPostController::list/$1');
     $routes->get('(:num)/score',     'RatingInPostController::score/$1');
@@ -133,14 +135,14 @@ $routes->group('ratings-in-posts', function ($routes) {
 });
 
 // -------- POST VIEWS --------
-$routes->group('post-views', function ($routes) {
+$routes->group('post-views', ['filter' => 'auth'], function ($routes) {
     $routes->post('',               'PostViewController::create');
     $routes->get('(:num)/views',    'PostViewController::list/$1');
     $routes->get('(:num)/views/count', 'PostViewController::count/$1');
 });
 
 // ---------- ATTACHMENTS ----------
-$routes->group('attachments', function ($routes) {
+$routes->group('attachments',  function ($routes) {
     $routes->get('',               'AttachmentController::index');
     $routes->get('(:num)',         'AttachmentController::show/$1');
     $routes->post('',              'AttachmentController::create');
@@ -151,7 +153,7 @@ $routes->group('attachments', function ($routes) {
 });
 
 // --- ATTACHMENT IN POSTS ---
-$routes->group('attachment-in-posts', function ($routes) {
+$routes->group('attachment-in-posts', ['filter' => 'auth'], function ($routes) {
     $routes->get('',               'AttachmentInPostController::index');
     $routes->get('(:num)/(:num)',  'AttachmentInPostController::show/$1/$2');
     $routes->post('',              'AttachmentInPostController::create');
@@ -159,7 +161,7 @@ $routes->group('attachment-in-posts', function ($routes) {
 });
 
 // -- ATTACHMENT IN COMMENTS --
-$routes->group('attachment-in-comments', function ($routes) {
+$routes->group('attachment-in-comments', ['filter' => 'auth'], function ($routes) {
     $routes->get('',               'AttachmentInCommentController::index');
     $routes->get('(:num)/(:num)',  'AttachmentInCommentController::show/$1/$2');
     $routes->post('',              'AttachmentInCommentController::create');
@@ -167,7 +169,7 @@ $routes->group('attachment-in-comments', function ($routes) {
 });
 
 // ---- RATINGS IN COMMENTS ----
-$routes->group('ratings-in-comments', function ($routes) {
+$routes->group('ratings-in-comments', ['filter' => 'auth'], function ($routes) {
     $routes->post('(:num)/votes',       'RatingInCommentController::toggle/$1');
     $routes->get('(:num)/votes',        'RatingInCommentController::score/$1');
     $routes->get('(:num)/votes/list',   'RatingInCommentController::listVotes/$1');
@@ -175,13 +177,13 @@ $routes->group('ratings-in-comments', function ($routes) {
 });
 
 // -------- SEARCH --------
-$routes->group('search', function($routes) {
+$routes->group('search', ['filter' => 'auth'], function($routes) {
     $routes->get('', 'SearchController::query');
     $routes->get('users', 'SearchController::users');
 });
 
 // ------- FRIENDSHIP --------
-$routes->group('friendship', function($routes) {
+$routes->group('friendship', ['filter' => 'auth'], function($routes) {
     $routes->get('status/(:num)/(:num)', 'FriendshipController::getStatus/$1/$2');
     $routes->post('send-request',     'FriendshipController::sendRequest');
     $routes->get('requests/(:num)',   'FriendshipController::getRequests/$1');
@@ -191,7 +193,7 @@ $routes->group('friendship', function($routes) {
 });
 
 // ------- NOTIFICATION --------
-$routes->group('notification', function($routes) {
+$routes->group('notification', ['filter' => 'auth'], function($routes) {
     $routes->get('formatted/(:num)',  'NotificationController::formattedNotifications/$1');
     $routes->put('clear/(:num)',      'NotificationController::clearNotification/$1');
     $routes->put('clear_all/(:num)',  'NotificationController::clearAllNotifications/$1');

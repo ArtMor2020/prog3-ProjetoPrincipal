@@ -5,12 +5,15 @@ namespace App\Controllers;
 use CodeIgniter\RESTful\ResourceController;
 use App\Repositories\CommentRepository;
 use App\Services\CommentService;
+use App\Services\NotificationService;
 
 class CommentController extends ResourceController
 {
     protected $format = 'json';
     protected CommentRepository $repository;
     protected CommentService $commentService;
+
+    protected NotificationService $notificationService;
 
     public function __construct()
     {
@@ -148,5 +151,26 @@ class CommentController extends ResourceController
         }
 
         return $this->respondDeleted(['status' => 'deleted']);
+    }
+
+    public function report($commentId = null)
+    {
+        if (!is_numeric($commentId)) {
+            return $this->failValidationError('ID de comentário inválido.');
+        }
+
+        $comment = $this->repository->findById((int)$commentId);
+        if (!$comment) {
+            return $this->failNotFound('Comentário não encontrado.');
+        }
+
+        $notificationService = new NotificationService();
+        $success = $notificationService->notifyAboutReportedComment($comment);
+
+        if (!$success) {
+            return $this->fail('Não foi possível registrar o report.', 500);
+        }
+
+        return $this->respond(['status' => 'reported'], 200);
     }
 }

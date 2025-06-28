@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import axios from "axios";
+import apiClient from '../api/axiosConfig'
 
 export default function LoginPage() {
   const { login } = useUser();
@@ -15,7 +16,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:8080/users/auth", {
+      const res = await apiClient.post("http://localhost:8080/users/auth", {
         email,
         password,
       });

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useUser } from "../contexts/UserContext";
 import { UserPlus, UserCheck, Clock, UserX } from "lucide-react";
+import apiClient from '../api/axiosConfig';
 
 export default function FriendshipButton({ profileUserId }) {
   const { user } = useUser();
@@ -15,7 +16,7 @@ export default function FriendshipButton({ profileUserId }) {
     }
 
     try {
-      const { data } = await axios.get(
+      const { data } = await apiClient.get(
         `http://localhost:8080/friendship/status/${user.id}/${profileUserId}`
       );
       setFriendshipStatus(data.status);
@@ -35,7 +36,7 @@ export default function FriendshipButton({ profileUserId }) {
   const handleSendRequest = async () => {
     setFriendshipStatus("loading");
     try {
-      await axios.post("http://localhost:8080/friendship/send-request", {
+      await apiClient.post("http://localhost:8080/friendship/send-request", {
         id_user1: user.id,
         id_user2: profileUserId,
       });
@@ -50,7 +51,7 @@ export default function FriendshipButton({ profileUserId }) {
     if (!requestId) return;
     setFriendshipStatus("loading");
     try {
-      await axios.put(`http://localhost:8080/friendship/accept/${requestId}`);
+      await apiClient.put(`http://localhost:8080/friendship/accept/${requestId}`);
       setFriendshipStatus("friends");
     } catch (error) {
       console.error("Erro ao aceitar pedido:", error);
@@ -62,7 +63,7 @@ export default function FriendshipButton({ profileUserId }) {
     if (!requestId) return;
     setFriendshipStatus("loading");
     try {
-      await axios.delete(
+      await apiClient.delete(
         `http://localhost:8080/friendship/refuse/${requestId}`
       );
       setFriendshipStatus("not_friends");

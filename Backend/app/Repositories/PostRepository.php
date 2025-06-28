@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\PostModel;
+use Throwable;
 
 class PostRepository
 {
@@ -64,6 +65,25 @@ class PostRepository
         }
     }
 
+    public function findAllSortedByScore(?int $viewerId = null): array
+    {
+        $blockedIds = $this->getBlockedIds($viewerId);
+        $builder = $this->model->builder();
+
+        $builder->select('post.*, COALESCE(SUM(CASE WHEN rating_in_post.is_upvote = 1 THEN 1 ELSE -1 END), 0) AS score')
+            ->join('rating_in_post', 'post.id = rating_in_post.id_post', 'left')
+            ->where('post.is_deleted', 0); 
+
+        if (!empty($blockedIds)) {
+            $builder->whereNotIn('post.id_user', $blockedIds);
+        }
+
+        $builder->groupBy('post.id')
+                ->orderBy('score', 'DESC');
+
+        return $builder->get()->getResultArray();
+    }
+
     public function findAll(?int $viewerId = null): array
     {
         $blockedIds = $this->getBlockedIds($viewerId);
@@ -91,16 +111,50 @@ class PostRepository
         }
     }
 
+    public function update(int $id, array $data): bool
+    {
+        try {
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            return (bool) $this->model->update($id, $data);
+        } catch (Throwable $e) {
+            log_message('error', '[PostRepository::update] ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deletePost(int $id): bool
+    {
+        $post = $this->model->find($id);
+
+        if (!$post || $post->getIsDeleted()) {
+            return false;
+        }
+
+        try {
+            return (bool) $this->model->update($id, ['is_deleted' => true]);
+        } catch (\Throwable $e) {
+            log_message('error', '[PostRepository::deletePost] ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
     public function findAllByCommunity(int $communityId, ?int $viewerId = null): array
     {
         $blockedIds = $this->getBlockedIds($viewerId);
-        $builder = $this->model->builder()->where('id_community', $communityId);
+        $builder = $this->model->builder()
+            ->select('post.*, COALESCE(SUM(CASE WHEN rating_in_post.is_upvote = 1 THEN 1 ELSE -1 END), 0) AS score')
+            ->join('rating_in_post', 'post.id = rating_in_post.id_post', 'left')
+            ->where('post.id_community', $communityId)
+            ->where('post.is_deleted', 0);
 
         if (!empty($blockedIds)) {
             $builder->whereNotIn('post.id_user', $blockedIds);
         }
+        
+        $builder->groupBy('post.id')->orderBy('score', 'DESC');
 
-        return $builder->get()->getResult();
+        return $builder->get()->getResultArray();
     }
 
     public function getPopularPosts(?int $page = 1, ?int $postsPerPage = 30, ?int $viewerId = null)
