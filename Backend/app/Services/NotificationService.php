@@ -100,13 +100,15 @@ class NotificationService
 
                 switch ($rawNotification->type) {
                     case 'mention_in_post':
-                    case 'post_report':
                         $post = $this->postRepository->findById($originId);
                         if ($post) {
-                            $text = ($rawNotification->type === 'post_report') 
-                                ? "O post \"{$post->getTitle()}\" foi reportado." 
-                                : "Você foi mencionado no post \"{$post->getTitle()}\".";
-                            $notificationData = ['id' => $rawNotification->id, 'type' => $rawNotification->type, 'text' => $text, 'target_id' => $post->getId()];
+                            $notificationData = [
+                                'id' => $rawNotification->id,
+                                'type' => $rawNotification->type,
+                                'text' => "Você foi mencionado no post \"{$post->getTitle()}\".",
+                                'target_id' => $post->getId(),
+                                'target_type' => 'post'
+                            ];
                         }
                         break;
                     
@@ -116,15 +118,27 @@ class NotificationService
                         if ($comment) {
                             $post = $this->postRepository->findById($comment->getIdParentPost());
                             if ($post) {
-                                $notificationData = ['id' => $rawNotification->id, 'type' => $rawNotification->type, 'text' => "Você foi mencionado em um comentário no post: \"{$post->getTitle()}\"", 'target_id' => $post->getId()];
+                                $notificationData = [
+                                    'id' => $rawNotification->id,
+                                    'type' => $rawNotification->type,
+                                    'text' => "Você foi mencionado em um comentário no post: \"{$post->getTitle()}\"",
+                                    'target_id' => $post->getId(), 
+                                    'target_type' => 'post'
+                                ];
                             }
                         }
                         break;
                     
                     case 'friend_request':
-                        $requester = $this->userRepository->getUserById($originId);
+                        $requester = $this->userRepository->getUserById((int)$originId);
                         if ($requester) {
-                            $notificationData = ['id' => $rawNotification->id, 'type' => $rawNotification->type, 'text' => "Novo pedido de amizade de u/{$requester->getName()}.", 'target_id' => $originId];
+                            $notificationData = [
+                                'id' => $rawNotification->id,
+                                'type' => $rawNotification->type,
+                                'text' => "Novo pedido de amizade de u/{$requester->getName()}.",
+                                'target_id' => $originId,
+                                'target_type' => 'user' 
+                            ];
                         }
                         break;
                     

@@ -118,7 +118,10 @@ export default function Header() {
 
     const { target_type, target_id } = notification;
 
-    if (!target_id) return;
+    if (!target_id) {
+        console.error("Notificação sem target_id:", notification);
+        return; 
+    }
 
     if (target_type === 'post') {
       history.push(`/posts/${target_id}`);
@@ -126,7 +129,10 @@ export default function Header() {
       history.push(`/users/${target_id}`);
     } else if (target_type === 'community') {
       history.push(`/communities/${target_id}`);
+    } else {
+        console.warn("Tipo de notificação desconhecido para redirecionamento:", target_type);
     }
+    // -----------------------------------------------------------
   };
 
   return (

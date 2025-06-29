@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import axios from "axios";
 import apiClient from '../api/axiosConfig'
@@ -36,7 +36,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6 shadow-lg rounded-lg">
-      <h1 className="text-2xl mb-4">Login</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
       {error && <div className="mb-4 text-red-600">{error}</div>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -59,6 +59,9 @@ export default function LoginPage() {
             required
           />
         </div>
+        <p>Ainda não possui uma conta? <Link to="/register" className="text-blue-600 hover:underline font-semibold">
+                  Clique aqui
+                </Link></p>
         <button
           type="submit"
           className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
